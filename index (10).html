@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星空题目挑战</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'space': {
+                            'dark': '#050A30',
+                            'medium': '#1A1A40',
+                            'light': '#270082'
+                        },
+                        'birthday': {
+                            'light': '#FFE6EB',
+                            'medium': '#FFB6C1',
+                            'dark': '#FF69B4'
+                        },
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 20px rgba(255, 255, 255, 0.5);
+            }
+            .star {
+                position: absolute;
+                background-color: white;
+                border-radius: 50%;
+                animation: twinkle 2s infinite alternate;
+            }
+            .answer-input {
+                width: 40px;
+                border: none;
+                border-bottom: 2px solid white;
+                background: transparent;
+                color: white;
+                text-align: center;
+                font-size: 1.2rem;
+                margin: 0 5px;
+                padding: 5px;
+            }
+            .answer-input-medium {
+                width: 60px;
+                border: none;
+                border-bottom: 2px solid white;
+                background: transparent;
+                color: white;
+                text-align: center;
+                font-size: 1.2rem;
+                margin: 0 5px;
+                padding: 5px;
+            }
+            .answer-input-long {
+                width: 80px;
+                border: none;
+                border-bottom: 2px solid white;
+                background: transparent;
+                color: white;
+                text-align: center;
+                font-size: 1.2rem;
+                margin: 0 5px;
+                padding: 5px;
+            }
+            .answer-input:focus, .answer-input-medium:focus, .answer-input-long:focus {
+                outline: none;
+                border-bottom: 2px solid #9333ea;
+            }
+            .correct {
+                border-bottom: 2px solid #10b981 !important;
+            }
+            .incorrect {
+                border-bottom: 2px solid #ef4444 !important;
+                animation: shake 0.5s;
+            }
+            .option-list {
+                text-align: left;
+                margin: 1rem auto;
+                max-width: 500px;
+                line-height: 1.8;
+            }
+            .combined-result {
+                margin: 2rem auto;
+                max-width: 90%;
+                padding: 2rem;
+                background-color: rgba(26, 26, 64, 0.6);
+                border-radius: 10px;
+                border: 1px solid rgba(147, 51, 234, 0.3);
+                font-size: 1.8rem;
+                letter-spacing: 0.2rem;
+                text-align: center;
+                font-family: monospace;
+                animation: pulse 3s infinite alternate, fadeIn 1s;
+                white-space: nowrap;
+                overflow-x: auto;
+                transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            .highlight {
+                color: #c084fc;
+                text-shadow: 0 0 10px rgba(192, 132, 252, 0.8);
+                font-weight: bold;
+            }
+            .char-transition {
+                display: inline-block;
+                transition: all 0.5s ease;
+                transform-origin: center;
+            }
+            .char-fade-out {
+                opacity: 0;
+                transform: scale(0.5) rotate(10deg);
+            }
+            .char-fade-in {
+                opacity: 0;
+                transform: scale(1.5) rotate(-10deg);
+                animation: charFadeIn 0.5s forwards 0.3s;
+            }
+            
+            /* 简约的生日主题装饰 */
+            .confetti {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                opacity: 0;
+            }
+            .balloon {
+                position: absolute;
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                animation: floatUp 10s infinite ease-in-out;
+            }
+            .balloon::after {
+                content: "";
+                position: absolute;
+                width: 1px;
+                height: 20px;
+                background-color: rgba(0,0,0,0.2);
+                bottom: -20px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            /* 圆点效果进度条样式 */
+            .progress-container {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80%;
+                max-width: 500px;
+                z-index: 10;
+            }
+            .progress-bar {
+                @apply h-2 bg-white/30 rounded-full overflow-hidden;
+            }
+            .progress-fill {
+                @apply h-full bg-primary transition-all duration-300 w-0;
+            }
+            .progress-text {
+                @apply text-xs text-white/80 mt-1 text-right;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes charFadeIn {
+            from { 
+                opacity: 0;
+                transform: scale(1.5) rotate(-10deg);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+        
+        @keyframes twinkle {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(30deg); opacity: 0; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(147, 51, 234, 0.3); }
+            100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(147, 51, 234, 0.6); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+                display: none;
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes confettiFall {
+            0% { transform: translateY(-10%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* 圆点出现动画 */
+        @keyframes dotAppear {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.6s ease-out forwards;
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.5);
+        }
+        
+        .content-section {
+            transition: all 0.5s ease;
+        }
+        
+        #loadingScreen {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            background-color: #050A30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .spinner {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            animation: spin 3s linear infinite;
+        }
+        
+        .spinner .star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 3px;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 1.5s infinite alternate;
+        }
+        
+        #finalizeBtn {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+            pointer-events: none;
+        }
+        
+        #finalizeBtn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        /* 结果容器样式 */
+        #resultContent {
+            transition: all 0.8s ease-out;
+        }
+        
+        /* 最终祝福信息样式 */
+        #finalBirthdayMessage {
+            position: fixed;
+            top: 5%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            animation: float 6s ease-in-out infinite;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+        }
+        
+        /* 生日祝福图片样式 */
+        #birthdayImageContainer {
+            position: fixed;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 80%;
+            max-height: 60vh;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 1s ease-out 0.5s;
+        }
+        
+        /* 生日主题背景 */
+        .birthday-bg {
+            background: linear-gradient(135deg, #FFE6EB 0%, #FFB6C1 100%);
+            transition: background 1s ease-out;
+        }
+        
+        /* 圆点动画画布容器 */
+        #dotCanvasContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="overflow-hidden h-screen bg-space-dark transition-all duration-1000">
+    <!-- 装饰元素容器 -->
+    <div id="decorations" class="absolute inset-0 z-0 pointer-events-none"></div>
+    
+    <!-- 加载动画层 -->
+    <div id="loadingScreen">
+        <div class="spinner">
+            <div class="star" style="transform: translate(-120%, -120%); animation-delay: 0.2s;"></div>
+            <div class="star" style="transform: translate(120%, -120%); animation-delay: 0.4s;"></div>
+            <div class="star" style="transform: translate(-120%, 120%); animation-delay: 0.6s;"></div>
+            <div class="star" style="transform: translate(120%, 120%); animation-delay: 0.8s;"></div>
+            <div class="star" style="transform: translate(0%, -180%); animation-delay: 1s;"></div>
+        </div>
+    </div>
+    
+    <!-- 星空背景容器 -->
+    <div id="stars" class="absolute inset-0 z-0"></div>
+    
+    <!-- 银河效果 -->
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-space-light/20 via-space-medium/10 to-transparent"></div>
+    
+    <!-- 1. 初始页 -->
+    <div id="initialContent" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center">
+        <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-white mb-8 text-shadow floating">
+            嘘......
+        </h1>
+        <p id="timeText" class="text-[clamp(1rem,2vw,1.5rem)] text-gray-200 max-w-2xl mb-12 leading-relaxed pulse">
+            现在是[当前日期时间]，给你准备了一个小小的礼物✨
+        </p>
+        <button id="nextPageBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2">
+            打开礼物 <i class="fa fa-gift"></i>
+        </button>
+    </div>
+    
+    <!-- 2. 第一题：电学题 -->
+    <div id="question1" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第一题：物理知识</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/circuit/800/400" alt="闭合电路示意图，包含电源、电阻和电流方向" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                在闭合电路中，电源的内电压等于电路中的电流 \( I \) 与电源内阻 \( r \) 的乘积，其表达式为内电压 \( U_1 = \) 
+                <input type="text" id="ans1" class="answer-input" maxlength="2" placeholder="_">
+            </p>
+            
+            <button id="sub1" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 3. 第二题：温度图题 -->
+    <div id="question2" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第二题：温度表示</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/temperature/800/400" alt="温度变化曲线图，标记有A点和H点的温度位置" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                如图，已知点A的温度表示为\( T_A \)，则图中点H的表示为 
+                <input type="text" id="ans2" class="answer-input" maxlength="2" placeholder="_">
+            </p>
+            
+            <button id="sub2" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 4. 第三题：英语题 -->
+    <div id="question3" class="content-section relative z-10 h-full flex flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第三题：英语填空</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/english/800/300" alt="英语学习相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                She looked <input type="text" id="ans3" class="answer-input-long" maxlength="5" placeholder="_"> (happiness) after hearing the good news.
+            </p>
+            
+            <button id="sub3" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 5. 第四题：椭圆定义题 -->
+    <div id="question4" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第四题：椭圆定义</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/ellipse/800/300" alt="椭圆及两个焦点的示意图" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-4">
+                平面内与两个定点 \( F_1、F_2 \) 的距离之和为常数的点的轨迹是椭圆，这个常数需要满足的条件是（ ）
+            </p>
+            
+            <div class="option-list text-gray-200 text-lg mb-8">
+                <p>A. 等于 \( |F_1F_2| \)</p>
+                <p>B. 大于 \( |F_1F_2| \)</p>
+                <p>C. 小于 \( |F_1F_2| \)</p>
+                <p>D. 与 \( |F_1F_2| \) 无关</p>
+            </div>
+            
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                请填入正确选项的字母：
+                <input type="text" id="ans4" class="answer-input" maxlength="1" placeholder="_">
+            </p>
+            
+            <button id="sub4" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 6. 第五题：英语填空题 -->
+    <div id="question5" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第五题：英语填空</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/english2/800/300" alt="英语学习相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                What makes this ____ (daily) different from her daily routine is that she decides to take a walk after dinner.
+            </p>
+            
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                请填入正确答案：
+                <input type="text" id="ans5" class="answer-input-long" maxlength="3" placeholder="_">
+            </p>
+            
+            <button id="sub5" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 7. 第六题：大语言模型缩写题 -->
+    <div id="question6" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第六题：AI知识</h3>
+        </div>
+        
+        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
+            <img src="https://picsum.photos/seed/ai/800/300" alt="AI和大语言模型相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        </div>
+        
+        <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
+            <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
+                已知现代AI常用大语言模型（Large Language Models）进行训练。请问其英文缩写是
+                <input type="text" id="ans6" class="answer-input-medium" maxlength="3" placeholder="_">
+            </p>
+            
+            <button id="sub6" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                提交答案 <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 8. 最终结果页：显示所有答案 -->
+    <div id="result" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div id="resultContent" class="w-full">
+            <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
+                <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">你的答题结果</h3>
+            </div>
+            
+            <div class="fade-in-up max-w-2xl mx-auto" style="animation-delay: 0.4s;">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 text-shadow">挑战完成！</h2>
+                
+                <!-- 合并显示所有答案的框 -->
+                <div id="combinedAnswers" class="combined-result text-gray-200 mb-8 mx-auto">
+                    <!-- 答案将通过JavaScript动态填充 -->
+                </div>
+                
+                <p id="resultText" class="text-gray-200 text-lg md:text-xl leading-relaxed mt-8 mb-8">
+                    这是特别为你准备的祝福 ✨<br>
+                    愿知识的星空永远照耀你的探索之路！
+                </p>
+                
+                <!-- 添加最终页按钮 -->
+                <button id="finalizeBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                    查看祝福 <i class="fa fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 动态圆点效果所需的元素 -->
+    <div id="dotAnimationContainer" class="fixed inset-0 z-50 hidden">
+        <div id="finalBirthdayMessage" class="font-bold text-white text-shadow"></div>
+        
+        <div id="birthdayImageContainer">
+            <div id="dotCanvasContainer">
+                <canvas id="dotCanvas" class="max-w-full max-h-[500px] object-contain shadow-xl rounded-lg"></canvas>
+            </div>
+        </div>
+        
+        <!-- 进度显示 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p id="progressText" class="progress-text">0%</p>
+        </div>
+    </div>
+
+    <script>
+        // 存储用户答案的变量
+        let userAnswers = {
+            question1: '',
+            question2: '',
+            question3: '',
+            question4: '',
+            question5: '',
+            question6: ''
+        };
+        
+        // 正确答案
+        const correctAnswers = {
+            question1: 'IR',
+            question2: 'TH',
+            question3: 'happy',
+            question4: 'B',
+            question5: 'day',
+            question6: 'LLM'
+        };
+        
+        // 彩色圆点动画相关变量
+        let currentImage = null;
+        let currentBackgroundColor = '#ffffff';
+        let imageData = null;
+        let animationInterval = null;
+        let animationActive = false;
+        let canvasWidth = 0;
+        let canvasHeight = 0;
+        let dotsData = []; // 存储所有圆点的信息
+        let dotsIndex = 0; // 当前绘制到的圆点索引
+        let animationFrameId = null; // 用于requestAnimationFrame
+        
+        // 调整圆点参数，减小圆点大小并降低密度
+        const fixedParams = {
+            speed: 100,      // 保持动画速度
+            dotSize: 3,      // 进一步减小圆点大小
+            density: 5.0,    // 降低密度，使圆点更稀疏
+            opacity: 100,    // 100%不透明度
+            gradientIntensity: 0.2 // 颜色渐变强度
+        };
+        
+        // 生成生日主题颜色集
+        const birthdayColors = [
+            {r: 255, g: 105, b: 180},  // 粉色
+            {r: 255, g: 182, b: 193},  // 浅粉色
+            {r: 255, g: 209, b: 220},  // 淡粉色
+            {r: 255, g: 230, b: 240},  // 极浅粉色
+            {r: 255, g: 165, b: 0},    // 橙色
+            {r: 255, g: 215, b: 0}     // 金色
+        ];
+        
+        // 更新日期和时间显示
+        function updateDateTime() {
+            const now = new Date();
+            const formatNumber = (n) => n.toString().padStart(2, '0');
+            
+            const year = now.getFullYear();
+            const month = formatNumber(now.getMonth() + 1);
+            const day = formatNumber(now.getDate());
+            const hours = formatNumber(now.getHours());
+            const minutes = formatNumber(now.getMinutes());
+            const seconds = formatNumber(now.getSeconds());
+            
+            const dateTimeString = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+            document.getElementById('timeText').textContent = `现在是${dateTimeString}，给你准备了一个小小的礼物✨`;
+        }
+        
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const totalStars = window.innerWidth < 768 ? 60 : 180;
+            const batchSize = 20;
+            let createdCount = 0;
+            
+            function createStarBatch() {
+                const endIndex = Math.min(createdCount + batchSize, totalStars);
+                
+                for (let i = createdCount; i < endIndex; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    const size = Math.random() * 2;
+                    const opacity = 0.3 + Math.random() * 0.7;
+                    const delay = Math.random() * 5;
+                    
+                    star.style.left = `${x}%`;
+                    star.style.top = `${y}%`;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.opacity = opacity;
+                    star.style.animationDelay = `${delay}s`;
+                    
+                    if (Math.random() > 0.85) {
+                        star.style.backgroundColor = '#D4AF37';
+                        star.style.boxShadow = '0 0 5px rgba(212, 175, 55, 0.8)';
+                    }
+                    
+                    starsContainer.appendChild(star);
+                }
+                
+                createdCount = endIndex;
+                if (createdCount < totalStars) {
+                    requestAnimationFrame(createStarBatch);
+                }
+            }
+            
+            requestAnimationFrame(createStarBatch);
+        }
+        
+        // 创建简约的生日装饰元素
+        function createBirthdayDecorations() {
+            const decorations = document.getElementById('decorations');
+            decorations.innerHTML = ''; // 清空现有装饰
+            
+            // 气球
+            const balloonColors = ['#FF69B4', '#FFB6C1', '#FFD1DC', '#FFE6F0'];
+            for (let i = 0; i < 6; i++) { 
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                
+                const size = 30 + Math.random() * 30;
+                const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                const left = Math.random() * 100;
+                const delay = Math.random() * 5;
+                
+                balloon.style.width = `${size}px`;
+                balloon.style.height = `${size}px`;
+                balloon.style.backgroundColor = color;
+                balloon.style.left = `${left}%`;
+                balloon.style.animationDelay = `${delay}s`;
+                
+                decorations.appendChild(balloon);
+            }
+            
+            // 彩屑
+            for (let i = 0; i < 40; i++) { 
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                const size = 5 + Math.random() * 6;
+                const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+                const left = Math.random() * 100;
+                const rotation = Math.random() * 360;
+                const delay = Math.random() * 3;
+                const duration = 4 + Math.random() * 5;
+                
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = color;
+                confetti.style.left = `${left}%`;
+                confetti.style.transform = `rotate(${rotation}deg)`;
+                confetti.style.animation = `confettiFall ${duration}s linear ${delay}s infinite`;
+                
+                decorations.appendChild(confetti);
+            }
+        }
+        
+        // 页面切换通用函数
+        function navigateToPage(fromPageId, toPageId) {
+            const fromPage = document.getElementById(fromPageId);
+            const toPage = document.getElementById(toPageId);
+            
+            fromPage.classList.add('fade-out');
+            setTimeout(() => {
+                fromPage.classList.add('hidden');
+                toPage.classList.remove('hidden', 'opacity-0');
+                // 确保MathJax正确渲染数学公式
+                if (window.MathJax) {
+                    MathJax.typesetPromise()
+                        .catch(err => console.error('MathJax渲染错误:', err));
+                }
+            }, 600);
+        }
+        
+        // 显示原始答题结果
+        function displayOriginalResults() {
+            const resultsElement = document.getElementById('combinedAnswers');
+            
+            // 按题目顺序显示用户输入的原始答案
+            const resultsHTML = `${userAnswers.question1 || '-'} ${userAnswers.question2 || '-'} ${userAnswers.question3 || '-'} ${userAnswers.question4 || '-'} ${userAnswers.question5 || '-'} ${userAnswers.question6 || '-'}`;
+            
+            resultsElement.innerHTML = resultsHTML;
+            
+            // 显示时间为2秒
+            setTimeout(animateToBirthdayMessage, 2000);
+        }
+        
+        // 字符动画效果 - 淡出
+        function animateCharactersOut(element) {
+            return new Promise((resolve) => {
+                const text = element.textContent;
+                element.innerHTML = '';
+                
+                // 将每个字符包装到span中以便动画
+                for (let i = 0; i < text.length; i++) {
+                    const charSpan = document.createElement('span');
+                    charSpan.classList.add('char-transition');
+                    charSpan.textContent = text[i];
+                    charSpan.style.animationDelay = `${i * 0.05}s`;
+                    element.appendChild(charSpan);
+                }
+                
+                // 添加淡出类
+                setTimeout(() => {
+                    const charSpans = element.querySelectorAll('.char-transition');
+                    charSpans.forEach(span => {
+                        span.classList.add('char-fade-out');
+                    });
+                    
+                    // 等待动画完成
+                    setTimeout(resolve, 500);
+                }, 100);
+            });
+        }
+        
+        // 字符动画效果 - 淡入
+        function animateCharactersIn(element, newText) {
+            return new Promise((resolve) => {
+                element.innerHTML = '';
+                
+                // 创建新字符的span
+                for (let i = 0; i < newText.length; i++) {
+                    const charSpan = document.createElement('span');
+                    charSpan.classList.add('char-transition', 'char-fade-in');
+                    charSpan.textContent = newText[i];
+                    charSpan.style.animationDelay = `${0.3 + i * 0.05}s`;
+                    element.appendChild(charSpan);
+                }
+                
+                // 等待动画完成
+                setTimeout(resolve, 1000);
+            });
+        }
+        
+        // 动画过渡到生日祝福信息
+        async function animateToBirthdayMessage() {
+            const resultsElement = document.getElementById('combinedAnswers');
+            const finalizeBtn = document.getElementById('finalizeBtn');
+            
+            // 获取用户答案并按顺序排列
+            const happy = userAnswers.question3 || 'HAPPY';
+            const b = userAnswers.question4 || 'B';
+            const ir = userAnswers.question1 || 'IR';
+            const th = userAnswers.question2 || 'TH';
+            const day = userAnswers.question5 || 'DAY';
+            const llm = userAnswers.question6 || 'LLM';
+            
+            // 确保HAPPY和BIRTHDAY之间有空格
+            const birthdayMessage = `${happy.toUpperCase()} ${b.toUpperCase()}${ir.toUpperCase()}${th.toUpperCase()}${day.toUpperCase()} ${llm.toUpperCase()}`;
+            
+            // 执行动画
+            await animateCharactersOut(resultsElement);
+            await animateCharactersIn(resultsElement, birthdayMessage);
+            
+            // 添加高亮效果
+            setTimeout(() => {
+                const charSpans = resultsElement.querySelectorAll('.char-transition');
+                charSpans.forEach(span => {
+                    if (span.textContent.trim() !== '') {
+                        span.classList.add('highlight');
+                    }
+                });
+                
+                // 动画完全完成后显示按钮
+                setTimeout(() => {
+                    finalizeBtn.classList.add('visible');
+                }, 500);
+            }, 500);
+        }
+        
+        // 显示所有答案结果
+        function displayAllResults() {
+            // 先隐藏按钮
+            document.getElementById('finalizeBtn').classList.remove('visible');
+            
+            // 先显示原始结果
+            displayOriginalResults();
+            
+            // 计算得分
+            let score = 0;
+            Object.keys(userAnswers).forEach(key => {
+                const userAnswer = userAnswers[key];
+                const correctAnswer = correctAnswers[key];
+                
+                if (key === 'question6') {
+                    if (userAnswer.toUpperCase() === correctAnswer) score++;
+                } else if (key === 'question4') {
+                    if (userAnswer.toUpperCase() === correctAnswer) score++;
+                } else {
+                    if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) score++;
+                }
+            });
+        }
+        
+        // 最终按钮功能：显示彩色圆点动画效果页面
+        function finalizeDisplay() {
+            // 隐藏所有内容区域
+            const contentSections = document.querySelectorAll('.content-section');
+            contentSections.forEach(section => {
+                section.style.opacity = 0;
+                section.style.transition = 'opacity 0.8s ease-out';
+            });
+            
+            // 隐藏星空和银河
+            const stars = document.getElementById('stars');
+            const galaxy = document.querySelector('.absolute.inset-0.z-0.bg-\\[radial-gradient\\(ellipse_at_center,_var\\(--tw-gradient-stops\\)\\)');
+            stars.style.opacity = 0;
+            stars.style.transition = 'opacity 1s ease-out';
+            if (galaxy) {
+                galaxy.style.opacity = 0;
+                galaxy.style.transition = 'opacity 1s ease-out';
+            }
+            
+            // 延迟后显示圆点动画容器
+            setTimeout(() => {
+                // 切换到简约粉色生日背景
+                document.body.classList.remove('bg-space-dark');
+                document.body.classList.add('birthday-bg');
+                
+                // 创建简约的生日装饰
+                createBirthdayDecorations();
+                
+                // 显示圆点动画容器
+                document.getElementById('dotAnimationContainer').classList.remove('hidden');
+                
+                // 设置生日祝福文字
+                const finalMessage = document.getElementById('finalBirthdayMessage');
+                finalMessage.textContent = 'HAPPY BIRTHDAY LLM';
+                finalMessage.style.opacity = 1;
+                
+                // 显示图片容器
+                document.getElementById('birthdayImageContainer').style.opacity = 1;
+                
+                // 加载示例图片并开始圆点动画
+                loadExampleImageAndAnimate();
+            }, 800);
+        }
+        
+        // 颜色混合函数，用于创建渐变效果
+        function mixColors(color1, color2, ratio) {
+            return {
+                r: Math.round(color1.r * (1 - ratio) + color2.r * ratio),
+                g: Math.round(color1.g * (1 - ratio) + color2.g * ratio),
+                b: Math.round(color1.b * (1 - ratio) + color2.b * ratio)
+            };
+        }
+        
+        // 从生日主题色集中随机选择颜色并添加变化
+        function getRandomBirthdayColor(x, y, width, height) {
+            // 基于位置选择基础颜色，创建渐变效果
+            const colorIndex = Math.floor((x / width) * birthdayColors.length) % birthdayColors.length;
+            const baseColor = birthdayColors[colorIndex];
+            
+            // 随机选择另一个颜色进行混合
+            const randomColor = birthdayColors[Math.floor(Math.random() * birthdayColors.length)];
+            
+            // 基于y坐标创建垂直方向的渐变效果
+            const ratio = (y / height) * fixedParams.gradientIntensity;
+            
+            // 混合颜色
+            const mixedColor = mixColors(baseColor, randomColor, ratio);
+            
+            return mixedColor;
+        }
+        
+        // 加载示例图片并开始圆点动画
+        function loadExampleImageAndAnimate() {
+            try {
+                // 使用更适合生日主题的示例图片
+                const exampleImageUrl = 'https://picsum.photos/seed/birthday/800/500';
+                
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = function() {
+                    currentImage = img;
+                    prepareDotData(img);
+                    startAnimation();
+                };
+                
+                img.onerror = function() {
+                    console.error('示例图片加载失败，尝试备用图片');
+                    // 尝试备用图片
+                    const fallbackImage = 'https://picsum.photos/seed/celebration/800/500';
+                    img.src = fallbackImage;
+                };
+                
+                img.src = exampleImageUrl;
+            } catch (error) {
+                console.error('加载示例图片错误:', error);
+                // 直接创建随机彩色圆点作为备用方案
+                createFallbackDotAnimation();
+            }
+        }
+        
+        // 创建备用的随机彩色圆点动画（当图片加载失败时）
+        function createFallbackDotAnimation() {
+            try {
+                // 停止任何正在进行的动画
+                if (animationActive) {
+                    if (animationInterval) clearInterval(animationInterval);
+                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    animationActive = false;
+                }
+                
+                // 设置Canvas尺寸
+                canvasWidth = 600;
+                canvasHeight = 400;
+                const dotCanvas = document.getElementById('dotCanvas');
+                dotCanvas.width = canvasWidth;
+                dotCanvas.height = canvasHeight;
+                const ctx = dotCanvas.getContext('2d');
+                
+                // 设置柔和的背景色
+                ctx.fillStyle = '#FFF0F5';
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                
+                // 生成随机圆点数据，按从左到右、从上到下的顺序
+                const totalDots = 1000; // 减少圆点数量，使分布更稀疏
+                dotsData = [];
+                const step = 15; // 增大点之间的间距，使分布更稀疏
+                
+                // 按行和列生成点，确保从左到右、从上到下的顺序
+                for (let y = 0; y < canvasHeight; y += step) {
+                    for (let x = 0; x < canvasWidth; x += step) {
+                        // 随机决定是否在该位置生成点，增加一些随机性
+                        if (Math.random() > 0.4) { // 减少生成概率，使圆点更稀疏
+                            // 获取基于位置的生日主题颜色
+                            const color = getRandomBirthdayColor(x, y, canvasWidth, canvasHeight);
+                            
+                            // 随机调整大小，增加变化
+                            const size = fixedParams.dotSize * (0.5 + Math.random() * 0.7);
+                            
+                            // 计算延迟，使点按顺序出现：先左后右，先上后下
+                            const delay = (y / canvasHeight) * 1000 + (x / canvasWidth) * 500;
+                            
+                            dotsData.push({
+                                x: x,
+                                y: y,
+                                size: size,
+                                color: `rgba(${color.r}, ${color.g}, ${color.b}, ${fixedParams.opacity / 100})`,
+                                delay: delay
+                            });
+                        }
+                    }
+                }
+                
+                // 重置进度
+                dotsIndex = 0;
+                updateProgress(0);
+                
+                // 启动动画
+                startAnimation();
+            } catch (error) {
+                console.error('创建备用动画错误:', error);
+            }
+        }
+        
+        // 准备圆点数据（计算所有需要绘制的圆点信息）
+        function prepareDotData(img) {
+            try {
+                // 停止任何正在进行的动画
+                if (animationActive) {
+                    if (animationInterval) clearInterval(animationInterval);
+                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    animationActive = false;
+                }
+                
+                // 设置Canvas尺寸
+                const maxDimension = 500;
+                let width = img.width;
+                let height = img.height;
+                
+                // 保持比例缩放
+                if (width > height) {
+                    if (width > maxDimension) {
+                        height = (height * maxDimension) / width;
+                        width = maxDimension;
+                    }
+                } else {
+                    if (height > maxDimension) {
+                        width = (width * maxDimension) / height;
+                        height = maxDimension;
+                    }
+                }
+                
+                canvasWidth = width;
+                canvasHeight = height;
+                const dotCanvas = document.getElementById('dotCanvas');
+                dotCanvas.width = width;
+                dotCanvas.height = height;
+                const ctx = dotCanvas.getContext('2d');
+                
+                // 使用固定参数
+                const baseDotSize = fixedParams.dotSize;
+                const density = fixedParams.density;
+                const opacity = fixedParams.opacity / 100;
+                
+                // 计算点之间的间距，密度越低间距越大（更稀疏）
+                const step = Math.max(2, 12 - density);
+                
+                // 创建一个临时画布来获取图像数据
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                tempCtx.drawImage(img, 0, 0, width, height);
+                
+                // 获取图像数据
+                imageData = tempCtx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                // 清空之前的圆点数据
+                dotsData = [];
+                
+                // 设置柔和的背景色
+                ctx.fillStyle = '#FFF0F5';
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                
+                // 预计算所有需要绘制的圆点信息，按从左到右、从上到下的顺序
+                for (let y = 0; y < height; y += step) {
+                    for (let x = 0; x < width; x += step) {
+                        // 获取像素位置
+                        const index = (y * width + x) * 4;
+                        
+                        // 获取RGB值
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        const a = data[index + 3] / 255; // 原始图像的透明度
+                        
+                        // 如果像素完全透明，则跳过
+                        if (a < 0.1) continue;
+                        
+                        // 计算亮度（用于调整圆点大小）
+                        const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                        
+                        // 根据亮度调整圆点大小：亮处圆点小，暗处圆点大
+                        const size = baseDotSize * (0.5 + (1 - brightness) * 0.7);
+                        
+                        // 计算延迟，使点按顺序出现：先左后右，先上后下
+                        const delay = (y / height) * 1000 + (x / width) * 500;
+                        
+                        // 存储圆点信息，保持从左到右、从上到下的顺序
+                        dotsData.push({
+                            x: x,
+                            y: y,
+                            size: size,
+                            color: `rgba(${r}, ${g}, ${b}, ${opacity * a})`,
+                            delay: delay
+                        });
+                    }
+                }
+                
+                // 重置进度
+                dotsIndex = 0;
+                updateProgress(0);
+                
+                if (dotsData.length === 0) {
+                    // 如果没有提取到有效像素，使用备用方案
+                    createFallbackDotAnimation();
+                }
+            } catch (error) {
+                console.error('准备圆点数据错误:', error);
+                // 出错时使用备用方案
+                createFallbackDotAnimation();
+            }
+        }
+        
+        // 使用requestAnimationFrame实现更流畅的动画
+        function animateDots() {
+            if (!animationActive) return;
+            
+            const totalDots = dotsData.length;
+            if (dotsIndex >= totalDots) {
+                animationActive = false;
+                return;
+            }
+            
+            const dotCanvas = document.getElementById('dotCanvas');
+            const ctx = dotCanvas.getContext('2d');
+            
+            // 每帧绘制的圆点数，根据动画速度调整
+            const dotsPerFrame = Math.max(1, Math.floor(fixedParams.speed / 30));
+            const endIndex = Math.min(dotsIndex + dotsPerFrame, totalDots);
+            
+            // 绘制当前批次的圆点
+            for (let i = dotsIndex; i < endIndex; i++) {
+                const dot = dotsData[i];
+                
+                // 创建圆点出现的动画效果
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                
+                // 创建径向渐变，使圆点更有立体感
+                const gradient = ctx.createRadialGradient(
+                    dot.x - dot.size * 0.3, 
+                    dot.y - dot.size * 0.3, 
+                    0,
+                    dot.x, 
+                    dot.y, 
+                    dot.size
+                );
+                
+                // 解析颜色值
+                const colorMatch = dot.color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+                if (colorMatch) {
+                    const r = colorMatch[1];
+                    const g = colorMatch[2];
+                    const b = colorMatch[3];
+                    const a = colorMatch[4];
+                    
+                    // 添加高光效果
+                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) + 0.2})`);
+                    gradient.addColorStop(0.7, dot.color);
+                    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) * 0.5})`);
+                } else {
+                    gradient.addColorStop(0, dot.color);
+                    gradient.addColorStop(1, dot.color);
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+            
+            dotsIndex = endIndex;
+            
+            // 更新进度
+            const progress = Math.floor((dotsIndex / totalDots) * 100);
+            updateProgress(progress);
+            
+            // 继续动画
+            animationFrameId = requestAnimationFrame(animateDots);
+        }
+        
+        // 开始动画
+        function startAnimation() {
+            try {
+                if (dotsData.length === 0) {
+                    // 如果仍然没有圆点数据，创建随机圆点
+                    createFallbackDotAnimation();
+                    return;
+                }
+                
+                animationActive = true;
+                // 使用requestAnimationFrame获得更流畅的动画
+                animationFrameId = requestAnimationFrame(animateDots);
+            } catch (error) {
+                console.error('动画启动错误:', error);
+                animationActive = false;
+            }
+        }
+        
+        // 更新进度显示
+        function updateProgress(percentage) {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}%`;
+        }
+        
+        // 验证各题答案的函数
+        function checkQuestion1() {
+            if (userAnswers.question1.toLowerCase() === correctAnswers.question1.toLowerCase()) {
+                document.getElementById('ans1').classList.add('correct');
+                document.getElementById('ans1').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    navigateToPage('question1', 'question2');
+                }, 1000);
+            } else {
+                document.getElementById('ans1').classList.add('incorrect');
+                document.getElementById('ans1').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans1').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function checkQuestion2() {
+            if (userAnswers.question2.toLowerCase() === correctAnswers.question2.toLowerCase()) {
+                document.getElementById('ans2').classList.add('correct');
+                document.getElementById('ans2').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    navigateToPage('question2', 'question3');
+                }, 1000);
+            } else {
+                document.getElementById('ans2').classList.add('incorrect');
+                document.getElementById('ans2').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans2').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function checkQuestion3() {
+            if (userAnswers.question3.toLowerCase() === correctAnswers.question3.toLowerCase()) {
+                document.getElementById('ans3').classList.add('correct');
+                document.getElementById('ans3').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    navigateToPage('question3', 'question4');
+                }, 1000);
+            } else {
+                document.getElementById('ans3').classList.add('incorrect');
+                document.getElementById('ans3').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans3').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function checkQuestion4() {
+            if (userAnswers.question4.toUpperCase() === correctAnswers.question4) {
+                document.getElementById('ans4').classList.add('correct');
+                document.getElementById('ans4').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    navigateToPage('question4', 'question5');
+                }, 1000);
+            } else {
+                document.getElementById('ans4').classList.add('incorrect');
+                document.getElementById('ans4').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans4').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function checkQuestion5() {
+            if (userAnswers.question5.toLowerCase() === correctAnswers.question5.toLowerCase()) {
+                document.getElementById('ans5').classList.add('correct');
+                document.getElementById('ans5').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    navigateToPage('question5', 'question6');
+                }, 1000);
+            } else {
+                document.getElementById('ans5').classList.add('incorrect');
+                document.getElementById('ans5').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans5').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        function checkQuestion6() {
+            if (userAnswers.question6.toUpperCase() === correctAnswers.question6) {
+                document.getElementById('ans6').classList.add('correct');
+                document.getElementById('ans6').classList.remove('incorrect');
+                
+                setTimeout(() => {
+                    displayAllResults();
+                    navigateToPage('question6', 'result');
+                }, 1000);
+            } else {
+                document.getElementById('ans6').classList.add('incorrect');
+                document.getElementById('ans6').classList.remove('correct');
+                
+                setTimeout(() => {
+                    document.getElementById('ans6').classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            // 初始化加载动画
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = 0;
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    createStars();
+                    
+                    // 页面加载完成后初始化MathJax
+                    if (window.MathJax) {
+                        MathJax.typesetPromise()
+                            .catch(err => console.error('MathJax初始化错误:', err));
+                    }
+                }, 500);
+            }, 500);
+            
+            // 初始化日期时间显示
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // 绑定初始页按钮事件
+            document.getElementById('nextPageBtn').addEventListener('click', () => {
+                navigateToPage('initialContent', 'question1');
+            });
+            
+            // 绑定最终页按钮事件
+            document.getElementById('finalizeBtn').addEventListener('click', finalizeDisplay);
+            
+            // 各题输入事件绑定
+            document.getElementById('ans1').addEventListener('input', function() {
+                userAnswers.question1 = this.value.trim();
+            });
+            document.getElementById('ans1').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion1();
+            });
+            document.getElementById('sub1').addEventListener('click', checkQuestion1);
+            
+            document.getElementById('ans2').addEventListener('input', function() {
+                userAnswers.question2 = this.value.trim();
+            });
+            document.getElementById('ans2').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion2();
+            });
+            document.getElementById('sub2').addEventListener('click', checkQuestion2);
+            
+            document.getElementById('ans3').addEventListener('input', function() {
+                userAnswers.question3 = this.value.trim();
+            });
+            document.getElementById('ans3').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion3();
+            });
+            document.getElementById('sub3').addEventListener('click', checkQuestion3);
+            
+            document.getElementById('ans4').addEventListener('input', function() {
+                userAnswers.question4 = this.value.trim();
+            });
+            document.getElementById('ans4').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion4();
+            });
+            document.getElementById('sub4').addEventListener('click', checkQuestion4);
+            
+            document.getElementById('ans5').addEventListener('input', function() {
+                userAnswers.question5 = this.value.trim();
+            });
+            document.getElementById('ans5').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion5();
+            });
+            document.getElementById('sub5').addEventListener('click', checkQuestion5);
+            
+            document.getElementById('ans6').addEventListener('input', function() {
+                userAnswers.question6 = this.value.trim();
+            });
+            document.getElementById('ans6').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkQuestion6();
+            });
+            document.getElementById('sub6').addEventListener('click', checkQuestion6);
+        });
+        
+        // 窗口大小变化时重绘星空
+        window.addEventListener('resize', function() {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = setTimeout(() => {
+                const starsContainer = document.getElementById('stars');
+                starsContainer.innerHTML = '';
+                createStars();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
+    
