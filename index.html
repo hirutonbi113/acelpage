@@ -195,6 +195,10 @@
                 opacity: 0;
                 transform: translateY(20px);
                 pointer-events: none;
+                /* 新增：确保按钮居中 */
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
             }
             
             /* 按钮显示状态 */
@@ -518,7 +522,7 @@
             transition: all 0.8s ease-out;
         }
         
-        /* 最终祝福信息样式 */
+        /* 最终祝福信息样式 - 增大手机端字体 */
         #finalBirthdayMessage {
             position: fixed;
             top: 5%;
@@ -530,20 +534,35 @@
             opacity: 0;
             transition: opacity 1s ease-out;
             animation: float 6s ease-in-out infinite;
-            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-size: clamp(2rem, 8vw, 3.5rem); /* 增大手机端字体 */
+            line-height: 1.2; /* 调整行高，避免文字重叠 */
         }
         
-        /* 生日祝福图片样式 - 调整位置和大小以适应1024x1024图片 */
+        /* 生日祝福图片样式 - 针对手机端优化 */
         #birthdayImageContainer {
             position: fixed;
-            top: 55%;  /* 向上移动了10% */
+            top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 70%;  /* 稍微缩小宽度 */
-            max-height: 50vh; /* 稍微缩小高度 */
+            width: 90%;  /* 增加宽度百分比 */
+            max-width: 90vw;  /* 手机端使用更宽的屏幕占比 */
+            max-height: 60vh;  /* 增加高度占比 */
             z-index: 50;
             opacity: 0;
             transition: opacity 1s ease-out 0.5s;
+        }
+        
+        /* 圆点画布容器 - 确保填充可用空间 */
+        #dotCanvasContainer {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 圆点画布 - 针对手机端优化 */
+        #dotCanvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 60vh;  /* 增加手机端画布高度 */
         }
         
         /* 生日主题背景 */
@@ -552,10 +571,10 @@
             transition: background 1s ease-out;
         }
         
-        /* 音频控制样式 - 默认隐藏 */
+        /* 音频控制样式 - 调整位置使其更容易点击 */
         .audio-controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 40px; /* 增加底部距离 */
             right: 20px;
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.5);
@@ -577,8 +596,8 @@
         }
         
         .audio-button {
-            width: 40px;
-            height: 40px;
+            width: 50px;  /* 增大按钮尺寸 */
+            height: 50px; /* 增大按钮尺寸 */
             background-color: #FF69B4;
             border: none;
             border-radius: 50%;
@@ -588,6 +607,7 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 1.2rem; /* 增大图标 */
         }
         
         /* 第二题图片容器的特殊样式 */
@@ -608,6 +628,76 @@
             .question2-image {
                 max-height: 50vh;
                 object-fit: contain;
+            }
+            
+            /* 桌面端保持适当的画布大小 */
+            #birthdayImageContainer {
+                max-width: 70%;
+                max-height: 50vh;
+            }
+            
+            #dotCanvas {
+                max-height: 50vh;
+            }
+            
+            /* 桌面端音频按钮位置 */
+            .audio-controls {
+                bottom: 30px;
+                right: 30px;
+            }
+            
+            .audio-button {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        /* 手机端特殊优化 */
+        @media (max-width: 767px) {
+            /* 增加手机端的装饰元素数量 */
+            .confetti {
+                width: 6px;
+                height: 6px;
+            }
+            
+            /* 调整手机端的圆点画布大小 */
+            #birthdayImageContainer {
+                top: 50%;  /* 稍微上移 */
+                width: 95%;  /* 更接近屏幕边缘 */
+                max-height: 65vh;  /* 增加高度占比 */
+            }
+            
+            #dotCanvas {
+                max-height: 65vh;  /* 增加高度 */
+            }
+            
+            /* 增加手机端的圆点密度 */
+            .mobile-dot-dense {
+                --dot-step: 8px !important;
+            }
+            
+            /* 增加手机端的彩带数量 */
+            .mobile-ribbon-more .ribbon {
+                animation-duration: 2s !important;
+            }
+            
+            /* 手机端最后一页标题文字 */
+            #finalBirthdayMessage {
+                font-size: clamp(2.2rem, 10vw, 3.5rem); /* 显著增大手机端字体 */
+                top: 3%; /* 稍微上移，留出更多空间 */
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            /* 手机端音频按钮优化 */
+            .audio-controls {
+                bottom: 50px; /* 进一步提高位置，确保在屏幕内可见 */
+                right: 15px;
+            }
+            
+            .audio-button {
+                width: 55px;  /* 更大的按钮尺寸 */
+                height: 55px;
             }
         }
     </style>
@@ -828,16 +918,16 @@
     <!-- 动态圆点效果所需的元素 -->
     <div id="dotAnimationContainer" class="fixed inset-0 z-50 hidden">
         <!-- 彩带覆盖层 - 放在画布上方 -->
-        <div class="ribbon-overlay" id="topLeftRibbonContainer" style="top: 0; left: 0;"></div>
-        <div class="ribbon-overlay" id="topRightRibbonContainer" style="top: 0; right: 0;"></div>
-        <div class="ribbon-overlay" id="bottomLeftRibbonContainer" style="bottom: 0; left: 0;"></div>
-        <div class="ribbon-overlay" id="bottomRightRibbonContainer" style="bottom: 0; right: 0;"></div>
+        <div class="ribbon-overlay mobile-ribbon-more" id="topLeftRibbonContainer" style="top: 0; left: 0;"></div>
+        <div class="ribbon-overlay mobile-ribbon-more" id="topRightRibbonContainer" style="top: 0; right: 0;"></div>
+        <div class="ribbon-overlay mobile-ribbon-more" id="bottomLeftRibbonContainer" style="bottom: 0; left: 0;"></div>
+        <div class="ribbon-overlay mobile-ribbon-more" id="bottomRightRibbonContainer" style="bottom: 0; right: 0;"></div>
         
         <div id="finalBirthdayMessage" class="font-bold text-white text-shadow"></div>
         
         <div id="birthdayImageContainer">
-            <div id="dotCanvasContainer">
-                <canvas id="dotCanvas" class="max-w-full max-h-[500px] object-contain shadow-xl rounded-lg"></canvas>
+            <div id="dotCanvasContainer" class="mobile-dot-dense">
+                <canvas id="dotCanvas" class="max-w-full max-h-[60vh] object-contain shadow-xl rounded-lg"></canvas>
             </div>
             
             <!-- 新增的信件按钮 -->
@@ -910,18 +1000,18 @@
         let ribbonsTriggered = false; // 标记彩带是否已触发
         let letterButtonShown = false; // 新增：标记信件按钮是否已显示
         
-        // 圆点参数配置
+        // 圆点参数配置 - 针对手机端优化
         const config = {
             dotSize: 3.2,       // 略微增大的圆点大小
-            density: 7.0,       // 增加后的密度
+            density: isMobileDevice() ? 9.0 : 7.0,  // 手机端使用更高的密度
             speed: 100,         // 动画速度
-            maxDimension: 450,  // 生成框大小
+            maxDimension: isMobileDevice() ? 380 : 450,  // 手机端使用稍小的最大尺寸以适应屏幕
             gradientIntensity: 0.2 // 颜色渐变强度
         };
         
         // 彩带配置 - 增加数量和尺寸以提高可见性
         const ribbonConfig = {
-            count: 70,          // 增加每个角落的彩带数量
+            count: isMobileDevice() ? 90 : 70,  // 手机端显示更多彩带
             colors: [
                 '#FF69B4', '#FFB6C1', '#FFD1DC', '#FFE6F0',  // 粉色系
                 '#FFA500', '#FFD700', '#FFFF00',             // 黄色/金色系
@@ -935,6 +1025,11 @@
             maxAnimationDuration: 3.5,
             interval: 60         // 缩短每批彩带的间隔时间
         };
+        
+        // 检测是否为移动设备
+        function isMobileDevice() {
+            return window.innerWidth < 768;
+        }
         
         // 生日主题颜色集
         const birthdayColors = [
@@ -1006,14 +1101,15 @@
             requestAnimationFrame(createStarBatch);
         }
         
-        // 创建简约的生日装饰元素
+        // 创建简约的生日装饰元素 - 手机端增加数量
         function createBirthdayDecorations() {
             const decorations = document.getElementById('decorations');
             decorations.innerHTML = ''; // 清空现有装饰
             
-            // 气球
+            // 气球 - 手机端显示更多气球
+            const balloonCount = isMobileDevice() ? 10 : 6;
             const balloonColors = ['#FF69B4', '#FFB6C1', '#FFD1DC', '#FFE6F0'];
-            for (let i = 0; i < 6; i++) { 
+            for (let i = 0; i < balloonCount; i++) { 
                 const balloon = document.createElement('div');
                 balloon.classList.add('balloon');
                 
@@ -1031,8 +1127,9 @@
                 decorations.appendChild(balloon);
             }
             
-            // 彩屑
-            for (let i = 0; i < 40; i++) { 
+            // 彩屑 - 手机端显示更多彩屑
+            const confettiCount = isMobileDevice() ? 80 : 40;
+            for (let i = 0; i < confettiCount; i++) { 
                 const confetti = document.createElement('div');
                 confetti.classList.add('confetti');
                 
@@ -1427,8 +1524,8 @@
         // 创建备用动画（当图片无法使用时）
         function createFallbackAnimation() {
             // 设置Canvas尺寸
-            const width = 450;  // 保持缩小后的尺寸
-            const height = 450; // 对于正方形图片
+            const width = config.maxDimension;  // 使用配置的最大尺寸
+            const height = config.maxDimension; // 对于正方形图片
             const canvas = document.getElementById('dotCanvas');
             canvas.width = width;
             canvas.height = height;
@@ -1440,7 +1537,7 @@
             
             // 生成随机圆点
             dotsData = [];
-            const step = 12;
+            const step = Math.max(2, 12 - config.density);
             
             for (let y = 0; y < height; y += step) {
                 for (let x = 0; x < width; x += step) {
