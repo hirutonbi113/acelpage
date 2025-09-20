@@ -152,25 +152,169 @@
                 left: 50%;
                 transform: translateX(-50%);
             }
-
-            /* 圆点效果进度条样式 */
-            .progress-container {
+            
+            /* 彩带特效样式 - 修改为覆盖画布的层 */
+            .ribbon-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                overflow: visible;
+                z-index: 55;
+            }
+            
+            .ribbon {
+                position: absolute;
+                width: 8px;
+                height: 30px;
+                opacity: 0;
+            }
+            
+            /* 动态圆点效果所需的元素 */
+            #dotCanvasContainer {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            
+            /* 信件按钮样式 - 初始隐藏 */
+            #letterButton {
+                margin-top: 2rem;
+                padding: 1rem 2rem;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                z-index: 60;
+                opacity: 0;
+                transform: translateY(20px);
+                pointer-events: none;
+            }
+            
+            /* 按钮显示状态 */
+            #letterButton.visible {
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+            
+            #letterButton:hover {
+                background-color: #A0522D;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+            }
+            
+            /* 信件弹窗样式 */
+            .letter-modal {
                 position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 80%;
-                max-width: 500px;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.5s ease;
+            }
+            
+            .letter-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .letter-content {
+                position: relative;
+                width: 90%;
+                max-width: 600px;
+                max-height: 80vh;
+                background-color: #FFF8E7;
+                border-radius: 5px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+                transform: scale(0.8) rotate(-5deg);
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            
+            .letter-modal.active .letter-content {
+                transform: scale(1) rotate(0);
+            }
+            
+            .letter-envelope {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #C41E3A;
+                z-index: 20;
+                transition: all 0.8s ease;
+                transform-origin: bottom center;
+            }
+            
+            .letter-modal.active .letter-envelope {
+                transform: rotateX(180deg);
+                opacity: 0;
+            }
+            
+            .letter-paper {
+                padding: 2rem;
+                overflow-y: auto;
+                height: 100%;
+                position: relative;
                 z-index: 10;
+                background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1c8b0' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
             }
-            .progress-bar {
-                @apply h-2 bg-white/30 rounded-full overflow-hidden;
+            
+            .letter-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background-color: #C41E3A;
+                color: white;
+                border: none;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 30;
+                transition: all 0.3s ease;
             }
-            .progress-fill {
-                @apply h-full bg-primary transition-all duration-300 w-0;
+            
+            .letter-close:hover {
+                background-color: #9e162f;
+                transform: rotate(90deg);
             }
-            .progress-text {
-                @apply text-xs text-white/80 mt-1 text-right;
+            
+            .letter-header {
+                text-align: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #d1c8b0;
+            }
+            
+            .letter-body {
+                line-height: 1.8;
+                font-size: 1.1rem;
+                color: #3a2e21;
+            }
+            
+            .letter-signature {
+                margin-top: 2rem;
+                text-align: right;
+                font-style: italic;
             }
         }
         
@@ -255,6 +399,47 @@
             0% { transform: scale(0); opacity: 0; }
             70% { transform: scale(1.2); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* 彩带动画 - 多个方向 */
+        @keyframes ribbonShootUpRight {
+            0% { transform: translate(0, 0) rotate(45deg); opacity: 1; }
+            100% { transform: translate(150px, -150px) rotate(70deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootUpLeft {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(-150px, -150px) rotate(-70deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootDownRight {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(150px, 150px) rotate(-70deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootDownLeft {
+            0% { transform: translate(0, 0) rotate(45deg); opacity: 1; }
+            100% { transform: translate(-150px, 150px) rotate(70deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootUp {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(0, -180px) rotate(20deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootDown {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(0, 180px) rotate(-20deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootLeft {
+            0% { transform: translate(0, 0) rotate(-90deg); opacity: 1; }
+            100% { transform: translate(-180px, 0) rotate(-70deg); opacity: 0; }
+        }
+        
+        @keyframes ribbonShootRight {
+            0% { transform: translate(0, 0) rotate(90deg); opacity: 1; }
+            100% { transform: translate(180px, 0) rotate(70deg); opacity: 0; }
         }
         
         .floating {
@@ -348,14 +533,14 @@
             font-size: clamp(1.5rem, 5vw, 3rem);
         }
         
-        /* 生日祝福图片样式 */
+        /* 生日祝福图片样式 - 调整位置和大小以适应1024x1024图片 */
         #birthdayImageContainer {
             position: fixed;
-            top: 65%;
+            top: 55%;  /* 向上移动了10% */
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 80%;
-            max-height: 60vh;
+            max-width: 70%;  /* 稍微缩小宽度 */
+            max-height: 50vh; /* 稍微缩小高度 */
             z-index: 50;
             opacity: 0;
             transition: opacity 1s ease-out 0.5s;
@@ -367,11 +552,63 @@
             transition: background 1s ease-out;
         }
         
-        /* 圆点动画画布容器 */
-        #dotCanvasContainer {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        /* 音频控制样式 - 默认隐藏 */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            padding: 10px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.5s ease;
+            transform: translateY(100px);
+            pointer-events: none;
+        }
+        
+        .audio-controls.visible {
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        .audio-controls:hover {
+            opacity: 1;
+        }
+        
+        .audio-button {
+            width: 40px;
+            height: 40px;
+            background-color: #FF69B4;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 第二题图片容器的特殊样式 */
+        .question2-image-container {
+            overflow-x: auto;
+            padding: 1rem;
+            max-width: 90vw;
+        }
+        
+        .question2-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            .question2-image {
+                max-height: 50vh;
+                object-fit: contain;
+            }
         }
     </style>
 </head>
@@ -396,6 +633,18 @@
     <!-- 银河效果 -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-space-light/20 via-space-medium/10 to-transparent"></div>
     
+    <!-- 背景音乐元素 -->
+    <audio id="birthdayMusic" loop>
+        <source src="https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/birthday.mp3" type="audio/mpeg">
+    </audio>
+     
+    <!-- 音频控制按钮 - 默认隐藏 -->
+    <div class="audio-controls" id="audioControls">
+        <button id="audioControl" class="audio-button">
+            <i class="fa fa-music"></i>
+        </button>
+    </div>
+    
     <!-- 1. 初始页 -->
     <div id="initialContent" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center">
         <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-white mb-8 text-shadow floating">
@@ -409,14 +658,23 @@
         </button>
     </div>
     
+    <!-- 新添加的说明页 -->
+    <div id="introPage" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
+        <div class="max-w-2xl mx-auto fade-in-up">
+            <p class="text-gray-200 text-xl md:text-2xl leading-relaxed mb-12 text-shadow">
+                当然，礼物不是白拿的，先来做六道题吧！
+            </p>
+            
+            <button id="startQuizBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
+                开始答题 <i class="fa fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+    
     <!-- 2. 第一题：电学题 -->
     <div id="question1" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第一题：物理知识</h3>
-        </div>
-        
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/circuit/800/400" alt="闭合电路示意图，包含电源、电阻和电流方向" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第一题</h3>
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -434,11 +692,12 @@
     <!-- 3. 第二题：温度图题 -->
     <div id="question2" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第二题：温度表示</h3>
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第二题</h3>
         </div>
         
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/temperature/800/400" alt="温度变化曲线图，标记有A点和H点的温度位置" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+        <!-- 修改图片容器，添加特殊样式解决横屏显示问题 -->
+        <div class="question2-image-container mb-8 fade-in-up" style="animation-delay: 0.2s;">
+            <img src="https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/chemistry.png" alt="化学反应装置示意图，标记有A点和H点的位置" class="question2-image rounded-lg shadow-lg border-2 border-purple-500/50">
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -456,11 +715,7 @@
     <!-- 4. 第三题：英语题 -->
     <div id="question3" class="content-section relative z-10 h-full flex flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第三题：英语填空</h3>
-        </div>
-        
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/english/800/300" alt="英语学习相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第三题</h3>
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -477,11 +732,7 @@
     <!-- 5. 第四题：椭圆定义题 -->
     <div id="question4" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第四题：椭圆定义</h3>
-        </div>
-        
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/ellipse/800/300" alt="椭圆及两个焦点的示意图" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第四题</h3>
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -510,11 +761,7 @@
     <!-- 6. 第五题：英语填空题 -->
     <div id="question5" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第五题：英语填空</h3>
-        </div>
-        
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/english2/800/300" alt="英语学习相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第五题</h3>
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -536,11 +783,7 @@
     <!-- 7. 第六题：大语言模型缩写题 -->
     <div id="question6" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
-            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第六题：AI知识</h3>
-        </div>
-        
-        <div class="mb-8 fade-in-up" style="animation-delay: 0.2s; max-width: 90%;">
-            <img src="https://picsum.photos/seed/ai/800/300" alt="AI和大语言模型相关图片" class="rounded-lg shadow-lg max-w-full h-auto object-cover border-2 border-purple-500/50">
+            <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第六题</h3>
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -571,13 +814,12 @@
                 </div>
                 
                 <p id="resultText" class="text-gray-200 text-lg md:text-xl leading-relaxed mt-8 mb-8">
-                    这是特别为你准备的祝福 ✨<br>
-                    愿知识的星空永远照耀你的探索之路！
+                    太强了👍物竞生化竞生数竞生英竞生信竞生👍
                 </p>
                 
                 <!-- 添加最终页按钮 -->
-                <button id="finalizeBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
-                    查看祝福 <i class="fa fa-heart"></i>
+                <button id="finalizeBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto visible">
+                    下一页➡
                 </button>
             </div>
         </div>
@@ -585,20 +827,51 @@
 
     <!-- 动态圆点效果所需的元素 -->
     <div id="dotAnimationContainer" class="fixed inset-0 z-50 hidden">
+        <!-- 彩带覆盖层 - 放在画布上方 -->
+        <div class="ribbon-overlay" id="topLeftRibbonContainer" style="top: 0; left: 0;"></div>
+        <div class="ribbon-overlay" id="topRightRibbonContainer" style="top: 0; right: 0;"></div>
+        <div class="ribbon-overlay" id="bottomLeftRibbonContainer" style="bottom: 0; left: 0;"></div>
+        <div class="ribbon-overlay" id="bottomRightRibbonContainer" style="bottom: 0; right: 0;"></div>
+        
         <div id="finalBirthdayMessage" class="font-bold text-white text-shadow"></div>
         
         <div id="birthdayImageContainer">
             <div id="dotCanvasContainer">
                 <canvas id="dotCanvas" class="max-w-full max-h-[500px] object-contain shadow-xl rounded-lg"></canvas>
             </div>
+            
+            <!-- 新增的信件按钮 -->
+            <button id="letterButton" class="mt-4">
+                <i class="fa fa-envelope mr-2"></i> 打开信件
+            </button>
         </div>
         
-        <!-- 进度显示 -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div id="progressFill" class="progress-fill"></div>
+        <!-- 信件弹窗 -->
+        <div class="letter-modal" id="letterModal">
+            <div class="letter-content">
+                <div class="letter-envelope"></div>
+                <div class="letter-paper">
+                    <div class="letter-header">
+                        <h2 class="text-2xl font-bold text-amber-800">生日祝福信</h2>
+                        <p class="text-amber-700 italic">致我最亲爱的朋友</p>
+                    </div>
+                    <div class="letter-body">
+                        <!-- 这里是可以自定义的信件内容 -->
+                        <p>亲爱的朋友：</p>
+                        <p>在这个特别的日子里，我想向你表达最诚挚的祝福。</p>
+                        <p>愿你的每一天都充满阳光和喜悦，愿你的所有梦想都能实现。</p>
+                        <p>感谢你一直以来的陪伴和支持，能认识你是我的荣幸。</p>
+                        <p>祝你生日快乐，永远幸福！</p>
+                    </div>
+                    <div class="letter-signature">
+                        <p>爱你的朋友</p>
+                        <p>2023年X月X日</p>
+                    </div>
+                </div>
+                <button class="letter-close" id="letterClose">
+                    <i class="fa fa-times"></i>
+                </button>
             </div>
-            <p id="progressText" class="progress-text">0%</p>
         </div>
     </div>
 
@@ -634,17 +907,36 @@
         let dotsData = []; // 存储所有圆点的信息
         let dotsIndex = 0; // 当前绘制到的圆点索引
         let animationFrameId = null; // 用于requestAnimationFrame
+        let ribbonsTriggered = false; // 标记彩带是否已触发
+        let letterButtonShown = false; // 新增：标记信件按钮是否已显示
         
-        // 调整圆点参数，减小圆点大小并降低密度
-        const fixedParams = {
-            speed: 100,      // 保持动画速度
-            dotSize: 3,      // 进一步减小圆点大小
-            density: 5.0,    // 降低密度，使圆点更稀疏
-            opacity: 100,    // 100%不透明度
+        // 圆点参数配置
+        const config = {
+            dotSize: 3.2,       // 略微增大的圆点大小
+            density: 7.0,       // 增加后的密度
+            speed: 100,         // 动画速度
+            maxDimension: 450,  // 生成框大小
             gradientIntensity: 0.2 // 颜色渐变强度
         };
         
-        // 生成生日主题颜色集
+        // 彩带配置 - 增加数量和尺寸以提高可见性
+        const ribbonConfig = {
+            count: 70,          // 增加每个角落的彩带数量
+            colors: [
+                '#FF69B4', '#FFB6C1', '#FFD1DC', '#FFE6F0',  // 粉色系
+                '#FFA500', '#FFD700', '#FFFF00',             // 黄色/金色系
+                '#9370DB', '#DDA0DD', '#EE82EE'              // 紫色系
+            ],
+            minLength: 20,      // 增加长度范围
+            maxLength: 70,
+            minWidth: 4,        // 增加宽度范围
+            maxWidth: 12,
+            animationDuration: 1.5, // 动画时间范围
+            maxAnimationDuration: 3.5,
+            interval: 60         // 缩短每批彩带的间隔时间
+        };
+        
+        // 生日主题颜色集
         const birthdayColors = [
             {r: 255, g: 105, b: 180},  // 粉色
             {r: 255, g: 182, b: 193},  // 浅粉色
@@ -760,6 +1052,94 @@
                 
                 decorations.appendChild(confetti);
             }
+        }
+        
+        // 创建彩带函数 - 改进为多方向、更分散的效果
+        function createRibbons() {
+            if (ribbonsTriggered) return;
+            ribbonsTriggered = true;
+            
+            // 获取画布位置和尺寸
+            const canvas = document.getElementById('dotCanvas');
+            const rect = canvas.getBoundingClientRect();
+            
+            // 定义所有发射点和对应的动画 - 移除了中间的彩带发射点
+            const 发射点 = [
+                {
+                    containerId: 'topLeftRibbonContainer',
+                    position: { top: rect.top, left: rect.left },
+                    animations: [
+                        'ribbonShootUpRight',
+                        'ribbonShootUp',
+                        'ribbonShootRight'
+                    ]
+                },
+                {
+                    containerId: 'topRightRibbonContainer',
+                    position: { top: rect.top, left: rect.right },
+                    animations: [
+                        'ribbonShootUpLeft',
+                        'ribbonShootUp',
+                        'ribbonShootLeft'
+                    ]
+                },
+                {
+                    containerId: 'bottomLeftRibbonContainer',
+                    position: { top: rect.bottom, left: rect.left },
+                    animations: [
+                        'ribbonShootDownRight',
+                        'ribbonShootDown',
+                        'ribbonShootRight'
+                    ]
+                },
+                {
+                    containerId: 'bottomRightRibbonContainer',
+                    position: { top: rect.bottom, left: rect.right },
+                    animations: [
+                        'ribbonShootDownLeft',
+                        'ribbonShootDown',
+                        'ribbonShootLeft'
+                    ]
+                }
+            ];
+            
+            // 为每个发射点设置位置并创建彩带
+            发射点.forEach(point => {
+                const container = document.getElementById(point.containerId);
+                container.style.position = 'absolute';
+                container.style.top = `${point.position.top}px`;
+                container.style.left = `${point.position.left}px`;
+                container.style.width = 'auto';
+                container.style.height = 'auto';
+                container.innerHTML = ''; // 清空容器
+                
+                // 为每个发射点创建彩带
+                for (let i = 0; i < ribbonConfig.count; i++) {
+                    setTimeout(() => {
+                        const ribbon = document.createElement('div');
+                        ribbon.classList.add('ribbon');
+                        
+                        // 随机属性
+                        const color = ribbonConfig.colors[Math.floor(Math.random() * ribbonConfig.colors.length)];
+                        const length = ribbonConfig.minLength + Math.random() * (ribbonConfig.maxLength - ribbonConfig.minLength);
+                        const width = ribbonConfig.minWidth + Math.random() * (ribbonConfig.maxWidth - ribbonConfig.minWidth);
+                        const delay = Math.random() * 0.8;
+                        const duration = ribbonConfig.animationDuration + Math.random() * (ribbonConfig.maxAnimationDuration - ribbonConfig.animationDuration);
+                        
+                        // 随机选择该发射点可用的动画
+                        const animation = point.animations[Math.floor(Math.random() * point.animations.length)];
+                        
+                        // 设置样式
+                        ribbon.style.backgroundColor = color;
+                        ribbon.style.height = `${length}px`;
+                        ribbon.style.width = `${width}px`;
+                        ribbon.style.animation = `${animation} ${duration}s ease-out ${delay}s forwards`;
+                        ribbon.style.boxShadow = `0 0 8px ${color}aa`; // 添加发光效果
+                        
+                        container.appendChild(ribbon);
+                    }, i * ribbonConfig.interval);
+                }
+            });
         }
         
         // 页面切换通用函数
@@ -899,8 +1279,357 @@
             });
         }
         
+        // 颜色混合函数，用于创建渐变效果
+        function mixColors(color1, color2, ratio) {
+            return {
+                r: Math.round(color1.r * (1 - ratio) + color2.r * ratio),
+                g: Math.round(color1.g * (1 - ratio) + color2.g * ratio),
+                b: Math.round(color1.b * (1 - ratio) + color2.b * ratio)
+            };
+        }
+        
+        // 从生日主题色集中随机选择颜色并添加变化
+        function getRandomBirthdayColor(x, y, width, height) {
+            // 基于位置选择基础颜色，创建渐变效果
+            const colorIndex = Math.floor((x / width) * birthdayColors.length) % birthdayColors.length;
+            const baseColor = birthdayColors[colorIndex];
+            
+            // 随机选择另一个颜色进行混合
+            const randomColor = birthdayColors[Math.floor(Math.random() * birthdayColors.length)];
+            
+            // 基于y坐标创建垂直方向的渐变效果
+            const ratio = (y / height) * config.gradientIntensity || 0.2;
+            
+            // 混合颜色
+            const mixedColor = mixColors(baseColor, randomColor, ratio);
+            
+            return mixedColor;
+        }
+        
+        // 加载指定图片
+        function loadCustomImage(imageUrl) {
+            // 重置状态，包括信件按钮状态
+            resetAnimation();
+            
+            const img = new Image();
+            
+            // 处理跨域图片
+            img.crossOrigin = 'anonymous';
+            
+            img.onload = function() {
+                prepareDotData(img);
+                startAnimation();
+            };
+            
+            img.onerror = function(error) {
+                console.error('图片加载错误:', error);
+                
+                // 使用备用方案
+                createFallbackAnimation();
+            };
+            
+            img.src = imageUrl;
+        }
+        
+        // 准备圆点数据
+        function prepareDotData(img) {
+            try {
+                // 计算缩放后的尺寸
+                let width = img.width;
+                let height = img.height;
+                
+                // 按比例缩放 - 特别针对1024x1024的正方形图片
+                if (width > height) {
+                    if (width > config.maxDimension) {
+                        height = (height * config.maxDimension) / width;
+                        width = config.maxDimension;
+                    }
+                } else {
+                    if (height > config.maxDimension) {
+                        width = (width * config.maxDimension) / height;
+                        height = config.maxDimension;
+                    }
+                }
+                
+                // 设置Canvas尺寸
+                const canvas = document.getElementById('dotCanvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                
+                // 清空画布并设置背景
+                ctx.fillStyle = '#f9f9f9';
+                ctx.fillRect(0, 0, width, height);
+                
+                // 创建临时画布获取图像数据
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                tempCtx.drawImage(img, 0, 0, width, height);
+                
+                // 获取图像数据
+                const imageData = tempCtx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                // 计算点间距（密度越高，间距越小）
+                const step = Math.max(2, 12 - config.density);
+                
+                // 存储圆点数据
+                dotsData = [];
+                
+                // 遍历图像像素，按顺序生成圆点
+                for (let y = 0; y < height; y += step) {
+                    for (let x = 0; x < width; x += step) {
+                        const index = (y * width + x) * 4;
+                        const r = data[index];
+                        const g = data[index + 1];
+                        const b = data[index + 2];
+                        const a = data[index + 3] / 255;
+                        
+                        // 跳过透明区域
+                        if (a < 0.1) continue;
+                        
+                        // 计算亮度调整大小
+                        const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                        const size = config.dotSize * (0.5 + (1 - brightness) * 0.7);
+                        
+                        // 按顺序计算延迟
+                        const delay = (y / height) * 1000 + (x / width) * 500;
+                        
+                        dotsData.push({
+                            x: x,
+                            y: y,
+                            size: size,
+                            color: `rgba(${r}, ${g}, ${b}, ${a})`,
+                            delay: delay
+                        });
+                    }
+                }
+                
+                console.log(`生成了 ${dotsData.length} 个圆点`);
+                
+                if (dotsData.length === 0) {
+                    throw new Error('没有从图片中提取到有效像素');
+                }
+                
+                // 重置进度索引和彩带触发状态
+                dotsIndex = 0;
+                ribbonsTriggered = false;
+                letterButtonShown = false; // 重置信件按钮状态
+                
+            } catch (error) {
+                console.error('准备圆点数据时出错:', error);
+                createFallbackAnimation();
+            }
+        }
+        
+        // 创建备用动画（当图片无法使用时）
+        function createFallbackAnimation() {
+            // 设置Canvas尺寸
+            const width = 450;  // 保持缩小后的尺寸
+            const height = 450; // 对于正方形图片
+            const canvas = document.getElementById('dotCanvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.fillStyle = '#f9f9f9';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 生成随机圆点
+            dotsData = [];
+            const step = 12;
+            
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    if (Math.random() > 0.3) {
+                        const color = getRandomBirthdayColor(x, y, width, height);
+                        const size = config.dotSize * (0.5 + Math.random() * 0.7);
+                        const delay = (y / height) * 1000 + (x / width) * 500;
+                        
+                        dotsData.push({
+                            x: x,
+                            y: y,
+                            size: size,
+                            color: `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`,
+                            delay: delay
+                        });
+                    }
+                }
+            }
+            
+            console.log(`生成了备用圆点: ${dotsData.length} 个`);
+            
+            // 重置进度索引和彩带触发状态
+            dotsIndex = 0;
+            ribbonsTriggered = false;
+            letterButtonShown = false; // 重置信件按钮状态
+        }
+        
+        // 开始动画
+        function startAnimation() {
+            if (dotsData.length === 0) {
+                return;
+            }
+            
+            animationActive = true;
+            animationFrameId = requestAnimationFrame(animateDots);
+        }
+        
+        // 动画绘制 - 修复了卡在最后一点的问题，调整了彩带和按钮出现时机
+        function animateDots() {
+            if (!animationActive) return;
+            
+            const totalDots = dotsData.length;
+            if (dotsIndex >= totalDots) {
+                animationActive = false;
+                return;
+            }
+            
+            // 计算动画进度
+            const progress = dotsIndex / totalDots;
+            
+            // 当动画进度达到90%且按钮未显示时，显示信件按钮
+            if (progress >= 0.90 && progress <= 1.0 && !letterButtonShown) {
+                const letterButton = document.getElementById('letterButton');
+                letterButton.classList.add('visible');
+                letterButtonShown = true;
+            }
+            
+            // 当动画进度达到95%时触发彩带效果
+            if (progress >= 0.95 && progress <= 1.0 && !ribbonsTriggered) {
+                createRibbons();
+            }
+            
+            const canvas = document.getElementById('dotCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 每帧绘制的圆点数 - 最后一批确保绘制所有剩余圆点
+            const remainingDots = totalDots - dotsIndex;
+            const dotsPerFrame = remainingDots < 10 ? remainingDots : Math.max(1, Math.floor(config.speed / 20));
+            
+            const endIndex = Math.min(dotsIndex + dotsPerFrame, totalDots);
+            
+            // 绘制当前批次的圆点
+            for (let i = dotsIndex; i < endIndex; i++) {
+                const dot = dotsData[i];
+                
+                // 绘制带高光效果的圆点
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                
+                // 创建渐变效果
+                const gradient = ctx.createRadialGradient(
+                    dot.x - dot.size * 0.3, 
+                    dot.y - dot.size * 0.3, 
+                    0,
+                    dot.x, 
+                    dot.y, 
+                    dot.size
+                );
+                
+                // 解析颜色
+                const colorMatch = dot.color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+                if (colorMatch) {
+                    const r = colorMatch[1];
+                    const g = colorMatch[2];
+                    const b = colorMatch[3];
+                    const a = colorMatch[4];
+                    
+                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) + 0.2})`);
+                    gradient.addColorStop(0.7, dot.color);
+                    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) * 0.5})`);
+                } else {
+                    gradient.addColorStop(0, dot.color);
+                    gradient.addColorStop(1, dot.color);
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+            
+            dotsIndex = endIndex;
+            
+            // 即使只剩下少量圆点，也继续动画直到完成
+            animationFrameId = requestAnimationFrame(animateDots);
+        }
+        
+        // 重置动画
+        function resetAnimation() {
+            if (animationActive) {
+                animationActive = false;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
+            }
+            
+            // 隐藏信件按钮
+            const letterButton = document.getElementById('letterButton');
+            letterButton.classList.remove('visible');
+            
+            dotsData = [];
+            dotsIndex = 0;
+            ribbonsTriggered = false;
+            letterButtonShown = false; // 重置信件按钮状态
+        }
+        
+        // 播放背景音乐
+        function playBirthdayMusic() {
+            const audio = document.getElementById('birthdayMusic');
+            
+            // 尝试播放音乐
+            audio.play().then(() => {
+                console.log('音乐播放成功');
+                updateAudioButton(true);
+            }).catch(error => {
+                console.error('音乐播放失败:', error);
+                // 如果自动播放失败，用户点击控制按钮时再尝试
+                document.getElementById('audioControl').addEventListener('click', function handleClick() {
+                    audio.play().then(() => {
+                        console.log('用户交互后音乐播放成功');
+                        updateAudioButton(true);
+                    }).catch(err => console.error('用户交互后音乐仍无法播放:', err));
+                    // 移除事件监听器，避免重复绑定
+                    this.removeEventListener('click', handleClick);
+                });
+            });
+        }
+        
+        // 更新音频控制按钮状态
+        function updateAudioButton(isPlaying) {
+            const audioButton = document.getElementById('audioControl');
+            if (isPlaying) {
+                audioButton.innerHTML = '<i class="fa fa-pause"></i>';
+            } else {
+                audioButton.innerHTML = '<i class="fa fa-play"></i>';
+            }
+        }
+        
+        // 切换音频播放状态
+        function toggleAudioPlayback() {
+            const audio = document.getElementById('birthdayMusic');
+            if (audio.paused) {
+                audio.play().then(() => {
+                    updateAudioButton(true);
+                }).catch(error => {
+                    console.error('无法播放音频:', error);
+                });
+            } else {
+                audio.pause();
+                updateAudioButton(false);
+            }
+        }
+        
         // 最终按钮功能：显示彩色圆点动画效果页面
         function finalizeDisplay() {
+            // 播放生日音乐
+            playBirthdayMusic();
+            
+            // 显示音频控制按钮
+            document.getElementById('audioControls').classList.add('visible');
+            
             // 隐藏所有内容区域
             const contentSections = document.querySelectorAll('.content-section');
             contentSections.forEach(section => {
@@ -938,332 +1667,39 @@
                 // 显示图片容器
                 document.getElementById('birthdayImageContainer').style.opacity = 1;
                 
-                // 加载示例图片并开始圆点动画
-                loadExampleImageAndAnimate();
+                // 自动加载指定图片并开始圆点动画
+                const imageUrl = 'https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/colored.png';
+                loadCustomImage(imageUrl);
             }, 800);
         }
         
-        // 颜色混合函数，用于创建渐变效果
-        function mixColors(color1, color2, ratio) {
-            return {
-                r: Math.round(color1.r * (1 - ratio) + color2.r * ratio),
-                g: Math.round(color1.g * (1 - ratio) + color2.g * ratio),
-                b: Math.round(color1.b * (1 - ratio) + color2.b * ratio)
-            };
-        }
-        
-        // 从生日主题色集中随机选择颜色并添加变化
-        function getRandomBirthdayColor(x, y, width, height) {
-            // 基于位置选择基础颜色，创建渐变效果
-            const colorIndex = Math.floor((x / width) * birthdayColors.length) % birthdayColors.length;
-            const baseColor = birthdayColors[colorIndex];
+        // 信件弹窗功能
+        function setupLetterModal() {
+            const letterButton = document.getElementById('letterButton');
+            const letterModal = document.getElementById('letterModal');
+            const letterClose = document.getElementById('letterClose');
             
-            // 随机选择另一个颜色进行混合
-            const randomColor = birthdayColors[Math.floor(Math.random() * birthdayColors.length)];
+            // 打开信件
+            letterButton.addEventListener('click', () => {
+                letterModal.classList.add('active');
+                // 禁用背景滚动
+                document.body.style.overflow = 'hidden';
+            });
             
-            // 基于y坐标创建垂直方向的渐变效果
-            const ratio = (y / height) * fixedParams.gradientIntensity;
+            // 关闭信件
+            letterClose.addEventListener('click', () => {
+                letterModal.classList.remove('active');
+                // 启用背景滚动
+                document.body.style.overflow = '';
+            });
             
-            // 混合颜色
-            const mixedColor = mixColors(baseColor, randomColor, ratio);
-            
-            return mixedColor;
-        }
-        
-        // 加载示例图片并开始圆点动画
-        function loadExampleImageAndAnimate() {
-            try {
-                // 使用更适合生日主题的示例图片
-                const exampleImageUrl = 'https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/colored.png';
-                
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                
-                img.onload = function() {
-                    currentImage = img;
-                    prepareDotData(img);
-                    startAnimation();
-                };
-                
-                img.onerror = function() {
-                    console.error('示例图片加载失败，尝试备用图片');
-                    // 尝试备用图片
-                    const fallbackImage = 'https://picsum.photos/seed/celebration/800/500';
-                    img.src = fallbackImage;
-                };
-                
-                img.src = exampleImageUrl;
-            } catch (error) {
-                console.error('加载示例图片错误:', error);
-                // 直接创建随机彩色圆点作为备用方案
-                createFallbackDotAnimation();
-            }
-        }
-        
-        // 创建备用的随机彩色圆点动画（当图片加载失败时）
-        function createFallbackDotAnimation() {
-            try {
-                // 停止任何正在进行的动画
-                if (animationActive) {
-                    if (animationInterval) clearInterval(animationInterval);
-                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                    animationActive = false;
+            // 点击外部关闭
+            letterModal.addEventListener('click', (e) => {
+                if (e.target === letterModal) {
+                    letterModal.classList.remove('active');
+                    document.body.style.overflow = '';
                 }
-                
-                // 设置Canvas尺寸
-                canvasWidth = 600;
-                canvasHeight = 400;
-                const dotCanvas = document.getElementById('dotCanvas');
-                dotCanvas.width = canvasWidth;
-                dotCanvas.height = canvasHeight;
-                const ctx = dotCanvas.getContext('2d');
-                
-                // 设置柔和的背景色
-                ctx.fillStyle = '#FFF0F5';
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-                
-                // 生成随机圆点数据，按从左到右、从上到下的顺序
-                const totalDots = 1000; // 减少圆点数量，使分布更稀疏
-                dotsData = [];
-                const step = 15; // 增大点之间的间距，使分布更稀疏
-                
-                // 按行和列生成点，确保从左到右、从上到下的顺序
-                for (let y = 0; y < canvasHeight; y += step) {
-                    for (let x = 0; x < canvasWidth; x += step) {
-                        // 随机决定是否在该位置生成点，增加一些随机性
-                        if (Math.random() > 0.4) { // 减少生成概率，使圆点更稀疏
-                            // 获取基于位置的生日主题颜色
-                            const color = getRandomBirthdayColor(x, y, canvasWidth, canvasHeight);
-                            
-                            // 随机调整大小，增加变化
-                            const size = fixedParams.dotSize * (0.5 + Math.random() * 0.7);
-                            
-                            // 计算延迟，使点按顺序出现：先左后右，先上后下
-                            const delay = (y / canvasHeight) * 1000 + (x / canvasWidth) * 500;
-                            
-                            dotsData.push({
-                                x: x,
-                                y: y,
-                                size: size,
-                                color: `rgba(${color.r}, ${color.g}, ${color.b}, ${fixedParams.opacity / 100})`,
-                                delay: delay
-                            });
-                        }
-                    }
-                }
-                
-                // 重置进度
-                dotsIndex = 0;
-                updateProgress(0);
-                
-                // 启动动画
-                startAnimation();
-            } catch (error) {
-                console.error('创建备用动画错误:', error);
-            }
-        }
-        
-        // 准备圆点数据（计算所有需要绘制的圆点信息）
-        function prepareDotData(img) {
-            try {
-                // 停止任何正在进行的动画
-                if (animationActive) {
-                    if (animationInterval) clearInterval(animationInterval);
-                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                    animationActive = false;
-                }
-                
-                // 设置Canvas尺寸
-                const maxDimension = 500;
-                let width = img.width;
-                let height = img.height;
-                
-                // 保持比例缩放
-                if (width > height) {
-                    if (width > maxDimension) {
-                        height = (height * maxDimension) / width;
-                        width = maxDimension;
-                    }
-                } else {
-                    if (height > maxDimension) {
-                        width = (width * maxDimension) / height;
-                        height = maxDimension;
-                    }
-                }
-                
-                canvasWidth = width;
-                canvasHeight = height;
-                const dotCanvas = document.getElementById('dotCanvas');
-                dotCanvas.width = width;
-                dotCanvas.height = height;
-                const ctx = dotCanvas.getContext('2d');
-                
-                // 使用固定参数
-                const baseDotSize = fixedParams.dotSize;
-                const density = fixedParams.density;
-                const opacity = fixedParams.opacity / 100;
-                
-                // 计算点之间的间距，密度越低间距越大（更稀疏）
-                const step = Math.max(2, 12 - density);
-                
-                // 创建一个临时画布来获取图像数据
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = width;
-                tempCanvas.height = height;
-                tempCtx.drawImage(img, 0, 0, width, height);
-                
-                // 获取图像数据
-                imageData = tempCtx.getImageData(0, 0, width, height);
-                const data = imageData.data;
-                
-                // 清空之前的圆点数据
-                dotsData = [];
-                
-                // 设置柔和的背景色
-                ctx.fillStyle = '#FFF0F5';
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-                
-                // 预计算所有需要绘制的圆点信息，按从左到右、从上到下的顺序
-                for (let y = 0; y < height; y += step) {
-                    for (let x = 0; x < width; x += step) {
-                        // 获取像素位置
-                        const index = (y * width + x) * 4;
-                        
-                        // 获取RGB值
-                        const r = data[index];
-                        const g = data[index + 1];
-                        const b = data[index + 2];
-                        const a = data[index + 3] / 255; // 原始图像的透明度
-                        
-                        // 如果像素完全透明，则跳过
-                        if (a < 0.1) continue;
-                        
-                        // 计算亮度（用于调整圆点大小）
-                        const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                        
-                        // 根据亮度调整圆点大小：亮处圆点小，暗处圆点大
-                        const size = baseDotSize * (0.5 + (1 - brightness) * 0.7);
-                        
-                        // 计算延迟，使点按顺序出现：先左后右，先上后下
-                        const delay = (y / height) * 1000 + (x / width) * 500;
-                        
-                        // 存储圆点信息，保持从左到右、从上到下的顺序
-                        dotsData.push({
-                            x: x,
-                            y: y,
-                            size: size,
-                            color: `rgba(${r}, ${g}, ${b}, ${opacity * a})`,
-                            delay: delay
-                        });
-                    }
-                }
-                
-                // 重置进度
-                dotsIndex = 0;
-                updateProgress(0);
-                
-                if (dotsData.length === 0) {
-                    // 如果没有提取到有效像素，使用备用方案
-                    createFallbackDotAnimation();
-                }
-            } catch (error) {
-                console.error('准备圆点数据错误:', error);
-                // 出错时使用备用方案
-                createFallbackDotAnimation();
-            }
-        }
-        
-        // 使用requestAnimationFrame实现更流畅的动画
-        function animateDots() {
-            if (!animationActive) return;
-            
-            const totalDots = dotsData.length;
-            if (dotsIndex >= totalDots) {
-                animationActive = false;
-                return;
-            }
-            
-            const dotCanvas = document.getElementById('dotCanvas');
-            const ctx = dotCanvas.getContext('2d');
-            
-            // 每帧绘制的圆点数，根据动画速度调整
-            const dotsPerFrame = Math.max(1, Math.floor(fixedParams.speed / 30));
-            const endIndex = Math.min(dotsIndex + dotsPerFrame, totalDots);
-            
-            // 绘制当前批次的圆点
-            for (let i = dotsIndex; i < endIndex; i++) {
-                const dot = dotsData[i];
-                
-                // 创建圆点出现的动画效果
-                ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
-                
-                // 创建径向渐变，使圆点更有立体感
-                const gradient = ctx.createRadialGradient(
-                    dot.x - dot.size * 0.3, 
-                    dot.y - dot.size * 0.3, 
-                    0,
-                    dot.x, 
-                    dot.y, 
-                    dot.size
-                );
-                
-                // 解析颜色值
-                const colorMatch = dot.color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
-                if (colorMatch) {
-                    const r = colorMatch[1];
-                    const g = colorMatch[2];
-                    const b = colorMatch[3];
-                    const a = colorMatch[4];
-                    
-                    // 添加高光效果
-                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) + 0.2})`);
-                    gradient.addColorStop(0.7, dot.color);
-                    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${parseFloat(a) * 0.5})`);
-                } else {
-                    gradient.addColorStop(0, dot.color);
-                    gradient.addColorStop(1, dot.color);
-                }
-                
-                ctx.fillStyle = gradient;
-                ctx.fill();
-            }
-            
-            dotsIndex = endIndex;
-            
-            // 更新进度
-            const progress = Math.floor((dotsIndex / totalDots) * 100);
-            updateProgress(progress);
-            
-            // 继续动画
-            animationFrameId = requestAnimationFrame(animateDots);
-        }
-        
-        // 开始动画
-        function startAnimation() {
-            try {
-                if (dotsData.length === 0) {
-                    // 如果仍然没有圆点数据，创建随机圆点
-                    createFallbackDotAnimation();
-                    return;
-                }
-                
-                animationActive = true;
-                // 使用requestAnimationFrame获得更流畅的动画
-                animationFrameId = requestAnimationFrame(animateDots);
-            } catch (error) {
-                console.error('动画启动错误:', error);
-                animationActive = false;
-            }
-        }
-        
-        // 更新进度显示
-        function updateProgress(percentage) {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressFill.style.width = `${percentage}%`;
-            progressText.textContent = `${percentage}%`;
+            });
         }
         
         // 验证各题答案的函数
@@ -1399,9 +1835,20 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
             
-            // 绑定初始页按钮事件
+            // 初始化信件弹窗功能
+            setupLetterModal();
+            
+            // 绑定音频控制按钮
+            document.getElementById('audioControl').addEventListener('click', toggleAudioPlayback);
+            
+            // 绑定初始页按钮事件 - 导航到说明页
             document.getElementById('nextPageBtn').addEventListener('click', () => {
-                navigateToPage('initialContent', 'question1');
+                navigateToPage('initialContent', 'introPage');
+            });
+            
+            // 绑定说明页按钮事件 - 导航到第一题
+            document.getElementById('startQuizBtn').addEventListener('click', () => {
+                navigateToPage('introPage', 'question1');
             });
             
             // 绑定最终页按钮事件
@@ -1469,4 +1916,3 @@
     </script>
 </body>
 </html>
-    
