@@ -97,17 +97,18 @@
             .combined-result {
                 margin: 2rem auto;
                 max-width: 90%;
-                padding: 2rem;
+                padding: 1.5rem; /* 减少内边距 */
                 background-color: rgba(26, 26, 64, 0.6);
                 border-radius: 10px;
                 border: 1px solid rgba(147, 51, 234, 0.3);
-                font-size: 1.8rem;
-                letter-spacing: 0.2rem;
+                font-size: clamp(1.2rem, 5vw, 1.8rem); /* 优化字体大小，使用clamp */
+                letter-spacing: 0.1rem; /* 减少字间距 */
                 text-align: center;
                 font-family: monospace;
                 animation: pulse 3s infinite alternate, fadeIn 1s;
                 white-space: nowrap;
-                overflow-x: auto;
+                overflow-x: auto; /* 确保在小屏幕上可以横向滚动 */
+                -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
                 transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .highlight {
@@ -523,7 +524,7 @@
             transition: all 0.8s ease-out;
         }
         
-        /* 最终祝福信息样式 - 增大手机端字体 */
+        /* 最终祝福信息样式 - 优化手机端字体 */
         #finalBirthdayMessage {
             position: fixed;
             top: 5%;
@@ -535,8 +536,11 @@
             opacity: 0;
             transition: opacity 1s ease-out;
             animation: float 6s ease-in-out infinite;
-            font-size: clamp(2rem, 8vw, 3.5rem); /* 增大手机端字体 */
+            font-size: clamp(1.8rem, 7vw, 3.5rem); /* 优化字体大小，使用clamp */
             line-height: 1.2; /* 调整行高，避免文字重叠 */
+            white-space: nowrap;
+            overflow-x: auto; /* 允许横向滚动 */
+            -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
         }
         
         /* 生日祝福图片样式 - 针对手机端优化 */
@@ -684,7 +688,7 @@
             
             /* 手机端最后一页标题文字 */
             #finalBirthdayMessage {
-                font-size: clamp(2.2rem, 10vw, 3.5rem); /* 显著增大手机端字体 */
+                font-size: clamp(1.8rem, 9vw, 3.5rem); /* 优化字体大小 */
                 top: 3%; /* 稍微上移，留出更多空间 */
                 padding-left: 10px;
                 padding-right: 10px;
@@ -943,20 +947,20 @@
                 <div class="letter-envelope"></div>
                 <div class="letter-paper">
                     <div class="letter-header">
-                        <h2 class="text-2xl font-bold text-amber-800">生日祝福信</h2>
-                        <p class="text-amber-700 italic">致大画家LLM</p>
+                        <h2 class="text-2xl font-bold text-amber-800">一封信</h2>
+                        <p class="text-amber-700 italic">致大画家李林蔓</p>
                     </div>
                     <div class="letter-body">
                         <!-- 更新为新的信件内容 -->
-                        <p>祝大画家LLM 18岁生日快乐！</p>
+                        <p>祝大画家李林蔓 18岁生日快乐！</p>
                         <p>恭喜你成功进化为完全民事行为能力人，并且完全解除地球online的所有限制啦。而我还是17岁的未成年小登，以后记得多让着我一点（（（</p>
                         <p>在这个举国同庆的日子里，就祝你生日快乐，心想事成，天天开心吧！</p>
                         <p>还有，明年的高考一定要大捷！金榜题名！</p>
                         <p>及时当勉励，岁月不待人💪💪💪</p>
                     </div>
                     <div class="letter-signature">
-                        <p>你的朋友</p>
-                        <p>2023年X月X日</p>
+                        <p>hyp</p>
+                        <p>2025年10月1日</p>
                     </div>
                 </div>
                 <button class="letter-close" id="letterClose">
@@ -2014,3 +2018,4 @@
     </script>
 </body>
 </html>
+    
