@@ -195,7 +195,7 @@
                 opacity: 0;
                 transform: translateY(20px);
                 pointer-events: none;
-                /* 新增：确保按钮居中 */
+                /* 确保按钮居中 */
                 display: block;
                 margin-left: auto;
                 margin-right: auto;
@@ -272,7 +272,7 @@
             
             .letter-paper {
                 padding: 2rem;
-                overflow-y: auto;
+                overflow-y: auto; /* 允许内容上下滚动 */
                 height: 100%;
                 position: relative;
                 z-index: 10;
@@ -313,6 +313,7 @@
                 line-height: 1.8;
                 font-size: 1.1rem;
                 color: #3a2e21;
+                padding-bottom: 2rem; /* 增加底部内边距，确保最后一行可见 */
             }
             
             .letter-signature {
@@ -943,18 +944,18 @@
                 <div class="letter-paper">
                     <div class="letter-header">
                         <h2 class="text-2xl font-bold text-amber-800">生日祝福信</h2>
-                        <p class="text-amber-700 italic">致我最亲爱的朋友</p>
+                        <p class="text-amber-700 italic">致大画家LLM</p>
                     </div>
                     <div class="letter-body">
-                        <!-- 这里是可以自定义的信件内容 -->
-                        <p>亲爱的朋友：</p>
-                        <p>在这个特别的日子里，我想向你表达最诚挚的祝福。</p>
-                        <p>愿你的每一天都充满阳光和喜悦，愿你的所有梦想都能实现。</p>
-                        <p>感谢你一直以来的陪伴和支持，能认识你是我的荣幸。</p>
-                        <p>祝你生日快乐，永远幸福！</p>
+                        <!-- 更新为新的信件内容 -->
+                        <p>祝大画家LLM 18岁生日快乐！</p>
+                        <p>恭喜你成功进化为完全民事行为能力人，并且完全解除地球online的所有限制啦。而我还是17岁的未成年小登，以后记得多让着我一点（（（</p>
+                        <p>在这个举国同庆的日子里，就祝你生日快乐，心想事成，天天开心吧！</p>
+                        <p>还有，明年的高考一定要大捷！金榜题名！</p>
+                        <p>及时当勉励，岁月不待人💪💪💪</p>
                     </div>
                     <div class="letter-signature">
-                        <p>爱你的朋友</p>
+                        <p>你的朋友</p>
                         <p>2023年X月X日</p>
                     </div>
                 </div>
