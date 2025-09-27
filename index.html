@@ -6,7 +6,8 @@
     <title>生日快乐🎂🎂🎂</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- 优化MathJax加载方式，添加async和defer属性 -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async defer></script>
     
     <!-- 配置Tailwind自定义颜色 -->
     <script>
@@ -580,7 +581,7 @@
             opacity: 0;
             transition: opacity 1s ease-out;
             animation: float 6s ease-in-out infinite;
-            font-size: clamp(1.8rem, 7vw, 3.5rem);
+            font-size: clamp(1.5rem, 7vw, 3rem);
             line-height: 1.2;
             white-space: nowrap;
             overflow-x: auto;
@@ -730,12 +731,12 @@
                 animation-duration: 2s !important;
             }
             
-            /* 手机端最后一页标题文字 */
+            /* 手机端最后一页标题文字 - 关键调整：减小字体大小 */
             #finalBirthdayMessage {
-                font-size: clamp(1.8rem, 9vw, 3.5rem);
+                font-size: clamp(1.5rem, 7vw, 3rem);
                 top: 3%;
-                padding-left: 10px;
-                padding-right: 10px;
+                padding-left: 5px;
+                padding-right: 5px;
             }
             
             /* 手机端音频按钮优化 */
@@ -1323,7 +1324,39 @@
             });
         }
         
-        // 页面切换通用函数
+        // 渲染数学公式的函数，增加重试机制
+        function renderMathInElement(element, retryCount = 3) {
+            // 检查MathJax是否加载完成
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                return MathJax.typesetPromise([element])
+                    .catch(err => {
+                        console.error('MathJax渲染错误:', err);
+                        // 如果还有重试次数，延迟后重试
+                        if (retryCount > 0) {
+                            console.log(`MathJax渲染失败，将重试 (剩余次数: ${retryCount-1})`);
+                            return new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve(renderMathInElement(element, retryCount - 1));
+                                }, 500);
+                            });
+                        }
+                        return Promise.reject(err);
+                    });
+            } else if (retryCount > 0) {
+                // MathJax尚未加载，等待后重试
+                console.log(`MathJax尚未加载，将重试 (剩余次数: ${retryCount-1})`);
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve(renderMathInElement(element, retryCount - 1));
+                    }, 500);
+                });
+            } else {
+                console.error('MathJax未加载且重试次数已用尽');
+                return Promise.reject(new Error('MathJax未加载'));
+            }
+        }
+        
+        // 页面切换通用函数，改进数学公式渲染
         function navigateToPage(fromPageId, toPageId) {
             const fromPage = document.getElementById(fromPageId);
             const toPage = document.getElementById(toPageId);
@@ -1332,11 +1365,26 @@
             setTimeout(() => {
                 fromPage.classList.add('hidden');
                 toPage.classList.remove('hidden', 'opacity-0');
-                // 确保MathJax正确渲染数学公式
-                if (window.MathJax) {
-                    MathJax.typesetPromise()
-                        .catch(err => console.error('MathJax渲染错误:', err));
-                }
+                
+                // 确保DOM完全渲染后再尝试渲染数学公式
+                setTimeout(() => {
+                    // 只在有数学公式的页面进行渲染
+                    if (toPageId === 'question1' || toPageId === 'question2' || toPageId === 'question4') {
+                        renderMathInElement(toPage)
+                            .then(() => console.log(`页面 ${toPageId} 的数学公式渲染成功`))
+                            .catch(err => {
+                                console.error(`页面 ${toPageId} 的数学公式渲染失败:`, err);
+                                // 添加用户可见的提示
+                                const mathElements = toPage.querySelectorAll('.MathJax_Preview');
+                                if (mathElements.length > 0) {
+                                    mathElements.forEach(el => {
+                                        el.textContent = '公式加载中...';
+                                        el.style.color = '#FFD700';
+                                    });
+                                }
+                            });
+                    }
+                }, 100); // 短暂延迟确保DOM已更新
             }, 600);
         }
         
@@ -2035,12 +2083,6 @@
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     createStars();
-                    
-                    // 页面加载完成后初始化MathJax
-                    if (window.MathJax) {
-                        MathJax.typesetPromise()
-                            .catch(err => console.error('MathJax初始化错误:', err));
-                    }
                 }, 500);
             }, 500);
             
@@ -2129,3 +2171,4 @@
     </script>
 </body>
 </html>
+    
