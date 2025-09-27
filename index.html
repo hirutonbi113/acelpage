@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星空题目挑战</title>
+    <title>生日快乐🎂🎂🎂</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -97,18 +97,18 @@
             .combined-result {
                 margin: 2rem auto;
                 max-width: 90%;
-                padding: 1.5rem; /* 减少内边距 */
+                padding: 1.5rem;
                 background-color: rgba(26, 26, 64, 0.6);
                 border-radius: 10px;
                 border: 1px solid rgba(147, 51, 234, 0.3);
-                font-size: clamp(1.2rem, 5vw, 1.8rem); /* 优化字体大小，使用clamp */
-                letter-spacing: 0.1rem; /* 减少字间距 */
+                font-size: clamp(1.2rem, 5vw, 1.8rem);
+                letter-spacing: 0.1rem;
                 text-align: center;
                 font-family: monospace;
                 animation: pulse 3s infinite alternate, fadeIn 1s;
                 white-space: nowrap;
-                overflow-x: auto; /* 确保在小屏幕上可以横向滚动 */
-                -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
                 transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             .highlight {
@@ -215,7 +215,7 @@
                 box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
             }
             
-            /* 信件弹窗样式 */
+            /* 信件弹窗样式 - 支持分页 */
             .letter-modal {
                 position: fixed;
                 top: 0;
@@ -273,11 +273,55 @@
             
             .letter-paper {
                 padding: 2rem;
-                overflow-y: auto; /* 允许内容上下滚动 */
-                height: 100%;
+                overflow-y: auto;  /* 确保内容可以上下滑动 */
+                max-height: 70vh;  /* 设置最大高度，确保在各种设备上都能显示完整并可滚动 */
                 position: relative;
                 z-index: 10;
                 background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1c8b0' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            }
+            
+            /* 信件分页样式 */
+            .letter-page {
+                display: none;
+                animation: fadeIn 0.5s ease-out;
+            }
+            
+            .letter-page.active {
+                display: block;
+            }
+            
+            .letter-navigation {
+                display: flex;
+                justify-content: flex-end;  /* 只在右侧显示下一页按钮 */
+                margin-top: 2rem;
+                padding-top: 1rem;
+                border-top: 1px dashed #d1c8b0;
+            }
+            
+            .letter-nav-btn {
+                background-color: #C41E3A;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .letter-nav-btn:disabled {
+                background-color: #d1c8b0;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .letter-nav-btn:hover:not(:disabled) {
+                background-color: #9e162f;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             }
             
             .letter-close {
@@ -314,7 +358,7 @@
                 line-height: 1.8;
                 font-size: 1.1rem;
                 color: #3a2e21;
-                padding-bottom: 2rem; /* 增加底部内边距，确保最后一行可见 */
+                padding-bottom: 2rem;
             }
             
             .letter-signature {
@@ -536,11 +580,11 @@
             opacity: 0;
             transition: opacity 1s ease-out;
             animation: float 6s ease-in-out infinite;
-            font-size: clamp(1.8rem, 7vw, 3.5rem); /* 优化字体大小，使用clamp */
-            line-height: 1.2; /* 调整行高，避免文字重叠 */
+            font-size: clamp(1.8rem, 7vw, 3.5rem);
+            line-height: 1.2;
             white-space: nowrap;
-            overflow-x: auto; /* 允许横向滚动 */
-            -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* 生日祝福图片样式 - 针对手机端优化 */
@@ -549,9 +593,9 @@
             top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;  /* 增加宽度百分比 */
-            max-width: 90vw;  /* 手机端使用更宽的屏幕占比 */
-            max-height: 60vh;  /* 增加高度占比 */
+            width: 90%;
+            max-width: 90vw;
+            max-height: 60vh;
             z-index: 50;
             opacity: 0;
             transition: opacity 1s ease-out 0.5s;
@@ -567,7 +611,7 @@
         #dotCanvas {
             width: 100% !important;
             height: auto !important;
-            max-height: 60vh;  /* 增加手机端画布高度 */
+            max-height: 60vh;
         }
         
         /* 生日主题背景 */
@@ -579,7 +623,7 @@
         /* 音频控制样式 - 调整位置使其更容易点击 */
         .audio-controls {
             position: fixed;
-            bottom: 40px; /* 增加底部距离 */
+            bottom: 40px;
             right: 20px;
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.5);
@@ -601,8 +645,8 @@
         }
         
         .audio-button {
-            width: 50px;  /* 增大按钮尺寸 */
-            height: 50px; /* 增大按钮尺寸 */
+            width: 50px;
+            height: 50px;
             background-color: #FF69B4;
             border: none;
             border-radius: 50%;
@@ -612,7 +656,7 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            font-size: 1.2rem; /* 增大图标 */
+            font-size: 1.2rem;
         }
         
         /* 第二题图片容器的特殊样式 */
@@ -667,13 +711,13 @@
             
             /* 调整手机端的圆点画布大小 */
             #birthdayImageContainer {
-                top: 50%;  /* 稍微上移 */
-                width: 95%;  /* 更接近屏幕边缘 */
-                max-height: 65vh;  /* 增加高度占比 */
+                top: 50%;
+                width: 95%;
+                max-height: 65vh;
             }
             
             #dotCanvas {
-                max-height: 65vh;  /* 增加高度 */
+                max-height: 65vh;
             }
             
             /* 增加手机端的圆点密度 */
@@ -688,21 +732,31 @@
             
             /* 手机端最后一页标题文字 */
             #finalBirthdayMessage {
-                font-size: clamp(1.8rem, 9vw, 3.5rem); /* 优化字体大小 */
-                top: 3%; /* 稍微上移，留出更多空间 */
+                font-size: clamp(1.8rem, 9vw, 3.5rem);
+                top: 3%;
                 padding-left: 10px;
                 padding-right: 10px;
             }
             
             /* 手机端音频按钮优化 */
             .audio-controls {
-                bottom: 50px; /* 进一步提高位置，确保在屏幕内可见 */
+                bottom: 50px;
                 right: 15px;
             }
             
             .audio-button {
-                width: 55px;  /* 更大的按钮尺寸 */
+                width: 55px;
                 height: 55px;
+            }
+            
+            /* 手机端信件分页按钮优化 */
+            .letter-navigation {
+                justify-content: center;
+            }
+            
+            .letter-nav-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -728,9 +782,9 @@
     <!-- 银河效果 -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-space-light/20 via-space-medium/10 to-transparent"></div>
     
-    <!-- 背景音乐元素 -->
+    <!-- 背景音乐元素 - 已更新URL -->
     <audio id="birthdayMusic" loop>
-        <source src="https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/birthday.mp3" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/hirutonbi113/llm1001/refs/heads/main/birthday.mp3" type="audio/mpeg">
     </audio>
      
     <!-- 音频控制按钮 - 默认隐藏 -->
@@ -746,10 +800,10 @@
             嘘......
         </h1>
         <p id="timeText" class="text-[clamp(1rem,2vw,1.5rem)] text-gray-200 max-w-2xl mb-12 leading-relaxed pulse">
-            现在是[当前日期时间]，给你准备了一个小小的礼物✨
+            现在是[当前日期时间]，给你准备了一个小小的贺卡✨
         </p>
         <button id="nextPageBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2">
-            打开礼物 <i class="fa fa-gift"></i>
+            打开贺卡 <i class="fa fa-envelope"></i>
         </button>
     </div>
     
@@ -757,7 +811,7 @@
     <div id="introPage" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="max-w-2xl mx-auto fade-in-up">
             <p class="text-gray-200 text-xl md:text-2xl leading-relaxed mb-12 text-shadow">
-                当然，礼物不是白拿的，先来做六道题吧！
+                当然，贺卡不是白拿的，先来做六道题吧！
             </p>
             
             <button id="startQuizBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg btn-hover flex items-center gap-2 mx-auto">
@@ -784,7 +838,7 @@
         </div>
     </div>
     
-    <!-- 3. 第二题：温度图题 -->
+    <!-- 3. 第二题：温度图题 - 已更新图片URL -->
     <div id="question2" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
             <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第二题</h3>
@@ -792,7 +846,7 @@
         
         <!-- 修改图片容器，添加特殊样式解决横屏显示问题 -->
         <div class="question2-image-container mb-8 fade-in-up" style="animation-delay: 0.2s;">
-            <img src="https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/chemistry.png" alt="化学反应装置示意图，标记有A点和H点的位置" class="question2-image rounded-lg shadow-lg border-2 border-purple-500/50">
+            <img src="https://raw.githubusercontent.com/hirutonbi113/llm1001/refs/heads/main/chemistry.png" alt="化学反应装置示意图，标记有A点和H点的位置" class="question2-image rounded-lg shadow-lg border-2 border-purple-500/50">
         </div>
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
@@ -941,26 +995,51 @@
             </button>
         </div>
         
-        <!-- 信件弹窗 -->
+        <!-- 信件弹窗 - 支持分页 -->
         <div class="letter-modal" id="letterModal">
             <div class="letter-content">
                 <div class="letter-envelope"></div>
                 <div class="letter-paper">
-                    <div class="letter-header">
-                        <h2 class="text-2xl font-bold text-amber-800">一封信</h2>
-                        <p class="text-amber-700 italic">致大画家李林蔓</p>
+                    <!-- 第一页信件内容 -->
+                    <div class="letter-page active" data-page="1">
+                        <div class="letter-header">
+                            <h2 class="text-2xl font-bold text-amber-800">生日快乐🎉🎉🎉</h2>
+                            <p class="text-amber-700 italic">TO LLM</p>
+                        </div>
+                        <div class="letter-body">
+                            <p>祝大画家李林蔓 18岁生日快乐！</p>
+                            <p>恭喜你成功进化为完全民事行为能力人，并且完全解除地球online的所有限制啦。以后记得多让着我们17岁未成年小登一点（（（</p>
+                            <p>在这个举国同庆的日子里，就祝你生日快乐，心想事成，天天开心吧！</p>
+                            <p>还有，预祝明年的高考大捷！金榜题名！</p>
+                            <p>及时当勉励，岁月不待人💪💪💪</p>
+                        </div>
+                        
+                        <div class="letter-navigation">
+                            <button class="letter-nav-btn" id="nextPage">
+                                下一页 <i class="fa fa-arrow-right"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="letter-body">
-                        <!-- 更新为新的信件内容 -->
-                        <p>祝大画家李林蔓 18岁生日快乐！</p>
-                        <p>恭喜你成功进化为完全民事行为能力人，并且完全解除地球online的所有限制啦。而我还是17岁的未成年小登，以后记得多让着我一点（（（</p>
-                        <p>在这个举国同庆的日子里，就祝你生日快乐，心想事成，天天开心吧！</p>
-                        <p>还有，明年的高考一定要大捷！金榜题名！</p>
-                        <p>及时当勉励，岁月不待人💪💪💪</p>
-                    </div>
-                    <div class="letter-signature">
-                        <p>hyp</p>
-                        <p>2025年10月1日</p>
+                    
+                    <!-- 第二页信件内容 - 每段前增加两个中文字符空格 -->
+                    <div class="letter-page" data-page="2">
+                        <div class="letter-header">
+                            <h2 class="text-2xl font-bold text-amber-800">续言</h2>
+                        </div>
+                        <div class="letter-body">
+                            <p>　　嗯……其实我还有一些话想对你说</p>
+                            <p>　　从入学后慢慢熟悉，到后来越聊越投机，不知不觉间，你早就成了我心里很合拍的朋友。两周前你聊起高中让人快速成长，我挺能感同身受的。现在回头看，两年前的自己大概有些迟钝，没能把握好朋友间的边界，不知不觉间闹出了些不愉快，现在想来还挺歉疚的。</p>
+                            <p>　　但抛开那些七七八八的想法和因素，我是真的很珍视这段友谊。高中三年都在一个班，兴趣爱好有交集，性格也可能有那么一点点相似👉👈，有过矛盾，也互相送过礼物，能拥有这些“特质”的朋友，对我来说格外难得。</p>
+                            <p>　　今年年初，我和你总算把话说开了，可我心里还是会有一点小顾虑，总担心自己的言行没注意分寸，又让你不开心，怕过去的小矛盾重演。有时候突然想着找你聊几句天，却会纠结 “这样会不会太突兀”，思来想去，最后还是把话咽了回去。上周没有直接在学校问你写作文相关的问题，其实也有这一点点因素。</p>
+                            <p>　　我想，你应该也是把我当朋友的吧？只是你具体的想法，我不太确定，也想着弄明白一点。因此，我有个小小的请求：希望你平时也可以和我搭上两句话。因为，我想让这段友谊延续下去。</p>
+                            <p>　　明明是你的生日，却是我许了个愿望呢。不过要是说出来的是你的愿望，那就不灵了。😋</p>
+                            <p>　　总之在最后，再祝你一次生日快乐吧！✨✨✨</p>
+                        </div>
+                        
+                        <div class="letter-signature">
+                            <p>hyp</p>
+                            <p>2025年10月1日</p>
+                        </div>
                     </div>
                 </div>
                 <button class="letter-close" id="letterClose">
@@ -1005,10 +1084,10 @@
         let ribbonsTriggered = false; // 标记彩带是否已触发
         let letterButtonShown = false; // 新增：标记信件按钮是否已显示
         
-        // 圆点参数配置 - 针对手机端优化
+        // 圆点参数配置 - 针对手机端优化，降低密度使圆点更稀疏
         const config = {
             dotSize: 3.2,       // 略微增大的圆点大小
-            density: isMobileDevice() ? 9.0 : 7.0,  // 手机端使用更高的密度
+            density: isMobileDevice() ? 6.0 : 7.0,  // 手机端降低密度，使圆点更稀疏
             speed: 100,         // 动画速度
             maxDimension: isMobileDevice() ? 380 : 450,  // 手机端使用稍小的最大尺寸以适应屏幕
             gradientIntensity: 0.2 // 颜色渐变强度
@@ -1059,7 +1138,7 @@
             const seconds = formatNumber(now.getSeconds());
             
             const dateTimeString = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
-            document.getElementById('timeText').textContent = `现在是${dateTimeString}，给你准备了一个小小的礼物✨`;
+            document.getElementById('timeText').textContent = `现在是${dateTimeString}，给你准备了一个小小的贺卡✨`;
         }
         
         // 创建星空背景
@@ -1474,7 +1553,7 @@
                 const imageData = tempCtx.getImageData(0, 0, width, height);
                 const data = imageData.data;
                 
-                // 计算点间距（密度越高，间距越小）
+                // 计算点间距（密度越低，间距越大，圆点越稀疏）
                 const step = Math.max(2, 12 - config.density);
                 
                 // 存储圆点数据
@@ -1492,11 +1571,16 @@
                         // 跳过透明区域
                         if (a < 0.1) continue;
                         
-                        // 计算亮度调整大小
+                        // 计算亮度（0表示最暗，1表示最亮）
                         const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-                        const size = config.dotSize * (0.5 + (1 - brightness) * 0.7);
                         
-                        // 按顺序计算延迟
+                        // 改进：颜色越深（亮度越低），圆点越大
+                        // 基础大小 + 基于暗度的增量（暗度 = 1 - 亮度）
+                        // 增加系数使效果更明显
+                        const darkness = 1 - brightness;
+                        const size = config.dotSize * (0.4 + darkness * 1.6);
+                        
+                        // 计算延迟
                         const delay = (y / height) * 1000 + (x / width) * 500;
                         
                         dotsData.push({
@@ -1548,7 +1632,13 @@
                 for (let x = 0; x < width; x += step) {
                     if (Math.random() > 0.3) {
                         const color = getRandomBirthdayColor(x, y, width, height);
-                        const size = config.dotSize * (0.5 + Math.random() * 0.7);
+                        
+                        // 计算颜色亮度（0表示最暗，1表示最亮）
+                        const brightness = (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
+                        const darkness = 1 - brightness;
+                        
+                        // 颜色越深，圆点越大
+                        const size = config.dotSize * (0.4 + darkness * 1.6);
                         const delay = (y / height) * 1000 + (x / width) * 500;
                         
                         dotsData.push({
@@ -1580,7 +1670,7 @@
             animationFrameId = requestAnimationFrame(animateDots);
         }
         
-        // 动画绘制 - 修复了卡在最后一点的问题，调整了彩带和按钮出现时机
+        // 动画绘制 - 调整为信件按钮和彩带同时出现
         function animateDots() {
             if (!animationActive) return;
             
@@ -1593,15 +1683,14 @@
             // 计算动画进度
             const progress = dotsIndex / totalDots;
             
-            // 当动画进度达到90%且按钮未显示时，显示信件按钮
-            if (progress >= 0.90 && progress <= 1.0 && !letterButtonShown) {
+            // 当动画进度达到95%时，同时显示信件按钮和彩带
+            if (progress >= 0.95 && progress <= 1.0 && !letterButtonShown) {
+                // 显示信件按钮
                 const letterButton = document.getElementById('letterButton');
                 letterButton.classList.add('visible');
                 letterButtonShown = true;
-            }
-            
-            // 当动画进度达到95%时触发彩带效果
-            if (progress >= 0.95 && progress <= 1.0 && !ribbonsTriggered) {
+                
+                // 触发彩带效果
                 createRibbons();
             }
             
@@ -1769,10 +1858,26 @@
                 // 显示图片容器
                 document.getElementById('birthdayImageContainer').style.opacity = 1;
                 
-                // 自动加载指定图片并开始圆点动画
-                const imageUrl = 'https://raw.githubusercontent.com/hirutonbi113/acelpage/refs/heads/main/colored.png';
+                // 自动加载指定图片并开始圆点动画 - 已更新图片URL
+                const imageUrl = 'https://raw.githubusercontent.com/hirutonbi113/llm1001/refs/heads/main/colored.png';
                 loadCustomImage(imageUrl);
             }, 800);
+        }
+        
+        // 信件分页功能 - 已删除上一页按钮相关逻辑
+        function setupLetterPagination() {
+            const nextPageBtn = document.getElementById('nextPage');
+            const audioElement = document.getElementById('birthdayMusic');
+            
+            // 第一页的下一页按钮 - 添加音乐循环控制
+            nextPageBtn.addEventListener('click', () => {
+                document.querySelector('.letter-page[data-page="1"]').classList.remove('active');
+                document.querySelector('.letter-page[data-page="2"]').classList.add('active');
+                
+                // 当到达第二页时，停止音乐循环
+                audioElement.loop = false;
+                console.log('已到达信件第二页，音乐将不再循环播放');
+            });
         }
         
         // 信件弹窗功能
@@ -1786,6 +1891,9 @@
                 letterModal.classList.add('active');
                 // 禁用背景滚动
                 document.body.style.overflow = 'hidden';
+                // 确保显示第一页
+                document.querySelector('.letter-page[data-page="1"]').classList.add('active');
+                document.querySelector('.letter-page[data-page="2"]').classList.remove('active');
             });
             
             // 关闭信件
@@ -1802,6 +1910,9 @@
                     document.body.style.overflow = '';
                 }
             });
+            
+            // 设置分页功能
+            setupLetterPagination();
         }
         
         // 验证各题答案的函数
@@ -1937,7 +2048,7 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
             
-            // 初始化信件弹窗功能
+            // 初始化信件弹窗功能（包含分页）
             setupLetterModal();
             
             // 绑定音频控制按钮
@@ -2018,4 +2129,3 @@
     </script>
 </body>
 </html>
-    
