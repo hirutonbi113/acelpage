@@ -6,8 +6,8 @@
     <title>生日快乐🎂🎂🎂</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- 优化MathJax加载方式，添加async和defer属性 -->
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async defer></script>
+    
+    <!-- 移除MathJax引用，因为不再需要数学公式 -->
     
     <!-- 配置Tailwind自定义颜色 -->
     <script>
@@ -291,25 +291,29 @@
                 display: block;
             }
             
+            /* 修改信件导航样式 - 让按钮紧跟在文本后 */
             .letter-navigation {
-                display: flex;
-                justify-content: flex-end;  /* 只在右侧显示下一页按钮 */
-                margin-top: 2rem;
-                padding-top: 1rem;
+                margin-top: 1rem; /* 减小与文本的距离 */
+                padding-top: 0.5rem;
                 border-top: 1px dashed #d1c8b0;
+                text-align: right; /* 保持靠右但更靠近文本 */
             }
             
+            /* 增强下一页按钮的视觉效果 */
             .letter-nav-btn {
                 background-color: #C41E3A;
                 color: white;
                 border: none;
-                padding: 0.5rem 1rem;
+                padding: 0.6rem 1.2rem; /* 增大按钮尺寸 */
                 border-radius: 4px;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                display: flex;
+                display: inline-flex; /* 改为inline-flex使按钮不占满整行 */
                 align-items: center;
                 gap: 0.5rem;
+                font-size: 1.1rem; /* 增大字体 */
+                font-weight: bold;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             }
             
             .letter-nav-btn:disabled {
@@ -322,7 +326,7 @@
             .letter-nav-btn:hover:not(:disabled) {
                 background-color: #9e162f;
                 transform: translateY(-2px);
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             }
             
             .letter-close {
@@ -359,7 +363,7 @@
                 line-height: 1.8;
                 font-size: 1.1rem;
                 color: #3a2e21;
-                padding-bottom: 2rem;
+                padding-bottom: 1rem; /* 减小底部内边距，让按钮更靠近文本 */
             }
             
             .letter-signature {
@@ -752,12 +756,13 @@
             
             /* 手机端信件分页按钮优化 */
             .letter-navigation {
-                justify-content: center;
+                text-align: center; /* 手机端居中显示按钮 */
             }
             
             .letter-nav-btn {
-                width: 100%;
-                justify-content: center;
+                width: auto; /* 自动宽度 */
+                padding: 0.7rem 1.5rem; /* 增大手机端按钮尺寸 */
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -821,7 +826,7 @@
         </div>
     </div>
     
-    <!-- 2. 第一题：电学题 -->
+    <!-- 2. 第一题：电学题（移除数学公式） -->
     <div id="question1" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
             <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第一题</h3>
@@ -829,7 +834,7 @@
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
             <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
-                在闭合电路中，电源的内电压等于电路中的电流 \( I \) 与电源内阻 \( r \) 的乘积，其表达式为内电压 \( U_1 = \) 
+                在闭合电路中，电源的内电压等于电路中的电流 I 与电源内阻 r 的乘积，其表达式为内电压 U₁ = 
                 <input type="text" id="ans1" class="answer-input" maxlength="2" placeholder="_">
             </p>
             
@@ -839,7 +844,7 @@
         </div>
     </div>
     
-    <!-- 3. 第二题：温度图题 - 已更新图片URL -->
+    <!-- 3. 第二题：温度图题（移除数学公式） -->
     <div id="question2" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
             <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第二题</h3>
@@ -852,7 +857,7 @@
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
             <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
-                如图，已知点A的温度表示为\( T_A \)，则图中点H的表示为 
+                如图，已知点A的温度表示为TA，则图中点H的表示为 
                 <input type="text" id="ans2" class="answer-input" maxlength="2" placeholder="_">
             </p>
             
@@ -879,7 +884,7 @@
         </div>
     </div>
     
-    <!-- 5. 第四题：椭圆定义题 -->
+    <!-- 5. 第四题：椭圆定义题（移除数学公式） -->
     <div id="question4" class="content-section relative z-10 h-full flex flex-col items-center justify-center px-4 text-center opacity-0 hidden">
         <div class="mb-6 fade-in-up" style="animation-delay: 0.1s;">
             <h3 class="text-xl md:text-2xl font-semibold text-white text-shadow">第四题</h3>
@@ -887,14 +892,14 @@
         
         <div class="fade-in-up max-w-2xl" style="animation-delay: 0.4s;">
             <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-4">
-                平面内与两个定点 \( F_1、F_2 \) 的距离之和为常数的点的轨迹是椭圆，这个常数需要满足的条件是（ ）
+                平面内与两个定点 F1、F2 的距离之和为常数的点的轨迹是椭圆，这个常数需要满足的条件是（ ）
             </p>
             
             <div class="option-list text-gray-200 text-lg mb-8">
-                <p>A. 等于 \( |F_1F_2| \)</p>
-                <p>B. 大于 \( |F_1F_2| \)</p>
-                <p>C. 小于 \( |F_1F_2| \)</p>
-                <p>D. 与 \( |F_1F_2| \) 无关</p>
+                <p>A. 等于 |F1F2|</p>
+                <p>B. 大于 |F1F2|</p>
+                <p>C. 小于 |F1F2|</p>
+                <p>D. 与 |F1F2| 无关</p>
             </div>
             
             <p class="text-gray-200 text-lg md:text-xl leading-relaxed mb-8">
@@ -1015,6 +1020,7 @@
                             <p>及时当勉励，岁月不待人💪💪💪</p>
                         </div>
                         
+                        <!-- 下一页按钮紧跟在文本后 -->
                         <div class="letter-navigation">
                             <button class="letter-nav-btn" id="nextPage">
                                 下一页 <i class="fa fa-arrow-right"></i>
@@ -1324,39 +1330,7 @@
             });
         }
         
-        // 渲染数学公式的函数，增加重试机制
-        function renderMathInElement(element, retryCount = 3) {
-            // 检查MathJax是否加载完成
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                return MathJax.typesetPromise([element])
-                    .catch(err => {
-                        console.error('MathJax渲染错误:', err);
-                        // 如果还有重试次数，延迟后重试
-                        if (retryCount > 0) {
-                            console.log(`MathJax渲染失败，将重试 (剩余次数: ${retryCount-1})`);
-                            return new Promise(resolve => {
-                                setTimeout(() => {
-                                    resolve(renderMathInElement(element, retryCount - 1));
-                                }, 500);
-                            });
-                        }
-                        return Promise.reject(err);
-                    });
-            } else if (retryCount > 0) {
-                // MathJax尚未加载，等待后重试
-                console.log(`MathJax尚未加载，将重试 (剩余次数: ${retryCount-1})`);
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        resolve(renderMathInElement(element, retryCount - 1));
-                    }, 500);
-                });
-            } else {
-                console.error('MathJax未加载且重试次数已用尽');
-                return Promise.reject(new Error('MathJax未加载'));
-            }
-        }
-        
-        // 页面切换通用函数，改进数学公式渲染
+        // 页面切换通用函数，移除了数学公式渲染相关代码
         function navigateToPage(fromPageId, toPageId) {
             const fromPage = document.getElementById(fromPageId);
             const toPage = document.getElementById(toPageId);
@@ -1365,26 +1339,6 @@
             setTimeout(() => {
                 fromPage.classList.add('hidden');
                 toPage.classList.remove('hidden', 'opacity-0');
-                
-                // 确保DOM完全渲染后再尝试渲染数学公式
-                setTimeout(() => {
-                    // 只在有数学公式的页面进行渲染
-                    if (toPageId === 'question1' || toPageId === 'question2' || toPageId === 'question4') {
-                        renderMathInElement(toPage)
-                            .then(() => console.log(`页面 ${toPageId} 的数学公式渲染成功`))
-                            .catch(err => {
-                                console.error(`页面 ${toPageId} 的数学公式渲染失败:`, err);
-                                // 添加用户可见的提示
-                                const mathElements = toPage.querySelectorAll('.MathJax_Preview');
-                                if (mathElements.length > 0) {
-                                    mathElements.forEach(el => {
-                                        el.textContent = '公式加载中...';
-                                        el.style.color = '#FFD700';
-                                    });
-                                }
-                            });
-                    }
-                }, 100); // 短暂延迟确保DOM已更新
             }, 600);
         }
         
@@ -2171,4 +2125,3 @@
     </script>
 </body>
 </html>
-    
